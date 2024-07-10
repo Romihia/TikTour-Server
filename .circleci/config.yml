@@ -17,12 +17,31 @@ jobs:
           command: npm install jest-junit
       - run:
           name: Run frontend tests
-          command: npm run test --ci --runInBand --reporters=default --reporters=jest-junit
+          command: npm test -- --ci --reporters=default --reporters=jest-junit
       - run:
-          name: run linter
+          name: run frontend linter
           command: npm run lint
       - store_test_results:
           path: ./test-results/
+
+  build-frontend:
+    executor: node/default
+    working_directory: ~/project/frontend
+    steps:
+      - checkout
+      - node/install-packages:
+          pkg-manager: npm
+      - run:
+          command: npm run build
+      - run:
+          name: Create the ~/artifacts directory if it doesn't exist
+          command: mkdir -p ~/artifacts
+      - run:
+          name: Copy frontend artifacts
+          command: cp -R build dist public .output .next .docusaurus ~/artifacts 2>/dev/null || true
+      - store_artifacts:
+          path: ~/artifacts
+          destination: frontend-build
 
   test-backend:
     executor: node/default
@@ -37,17 +56,42 @@ jobs:
           command: npm install jest-junit
       - run:
           name: Run backend tests
-          command: npm run test --ci --runInBand --reporters=default --reporters=jest-junit
+          command: npm test -- --ci --reporters=default --reporters=jest-junit
       - run:
-          name: run linter
+          name: run backend linter
           command: npm run lint
       - store_test_results:
           path: ./test-results/
+
+  build-backend:
+    executor: node/default
+    working_directory: ~/project/backend
+    steps:
+      - checkout
+      - node/install-packages:
+          pkg-manager: npm
+      - run:
+          command: npm run build
+      - run:
+          name: Create the ~/artifacts directory if it doesn't exist
+          command: mkdir -p ~/artifacts
+      - run:
+          name: Copy backend artifacts
+          command: cp -R build dist public .output .next .docusaurus ~/artifacts 2>/dev/null || true
+      - store_artifacts:
+          path: ~/artifacts
+          destination: backend-build
 
 workflows:
   build-and-test:
     jobs:
       - test-frontend
-      - test-backend:
+      - build-frontend:
           requires:
             - test-frontend
+      - test-backend:
+          requires:
+            - build-frontend
+      - build-backend:
+          requires:
+            - test-backend
