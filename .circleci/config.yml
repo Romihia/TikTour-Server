@@ -15,9 +15,6 @@ jobs:
       - node/install-packages:
           pkg-manager: npm
       - run:
-          name: Change to frontend directory
-          command: cd frontend
-      - run:
           command: npm install jest-junit
       - run:
           name: Run frontend tests
@@ -36,9 +33,6 @@ jobs:
     steps:
       - checkout:
           path: ~/project
-      - run:
-          name: Change to backend directory
-          command: cd backend
       - node/install-packages:
           pkg-manager: npm
       - run:
