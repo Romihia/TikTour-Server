@@ -1,64 +1,51 @@
-# This config was automatically generated from your source code
-# Stacks detected: deps:node:app,test:jest:
 version: 2.1
+
 orbs:
   node: circleci/node@5
-jobs:
-  test-node:
-    # Install node dependencies and run tests
-    executor: node/default
-    working_directory: ~/project/app
-    environment:
-      JEST_JUNIT_OUTPUT_DIR: ./test-results/
-    steps:
-      - checkout:
-          path: ~/project
-      - node/install-packages:
-          pkg-manager: npm
-      - run:
-          command: npm install jest-junit
-      - run:
-          name: Run tests
-          command: npm run test --ci --runInBand --reporters=default --reporters=jest-junit
-      - store_test_results:
-          path: ./test-results/
-  build-node:
-    # Build node project
-    executor: node/default
-    working_directory: ~/project/app
-    steps:
-      - checkout:
-          path: ~/project
-      - node/install-packages:
-          pkg-manager: npm
-      - run:
-          command: npm run build
-      - run:
-          name: Create the ~/artifacts directory if it doesn't exist
-          command: mkdir -p ~/artifacts
-      # Copy output to artifacts dir
-      - run:
-          name: Copy artifacts
-          command: cp -R build dist public .output .next .docusaurus ~/artifacts 2>/dev/null || true
-      - store_artifacts:
-          path: ~/artifacts
-          destination: node-build
-  deploy:
-    # This is an example deploy job, not actually used by the workflow
-    docker:
-      - image: cimg/base:stable
-    steps:
-      # Replace this with steps to deploy to users
-      - run:
-          name: deploy
-          command: '#e.g. ./deploy.sh'
+
 workflows:
-  build-and-test:
+  my-workflow:
     jobs:
-      - test-node
-      - build-node:
-          requires:
-            - test-node
-    # - deploy:
-    #     requires:
-    #       - build-node
+      - build-test-lint-frontend
+      - build-test-lint-backend
+
+jobs:
+  build-test-lint-frontend:
+    executor: node/default
+    steps:
+      - checkout
+      - run:
+          name: change to frontend directory
+          command: cd frontend
+      - run:
+          name: install frontend dependencies
+          command: npm install --legacy-peer-deps
+      - run:
+          name: run frontend tests
+          command: npm run test
+      - run:
+          name: run frontend linter
+          command: npm run lint
+      # - run:
+      #     name: deploy frontend
+      #     command: curl "https://api.render.com/deploy/srv-cq6iulcs1f4s73e4df0g?key=qyy55YltldM"
+
+  build-test-lint-backend:
+    executor: node/default
+    steps:
+      - checkout
+      - run:
+          name: change to backend directory
+          command: cd backend
+      - run:
+          name: install backend dependencies
+          command: npm install
+      - run:
+          name: run backend tests
+          command: npm run test
+      - run:
+          name: run backend linter
+          command: npm run lint
+      # - run:
+      #     name: deploy backend
+      #     command: curl "https://api.render.com/deploy/srv-cq6iulcs1f4s73e4df0g?key=qyy55YltldM"
