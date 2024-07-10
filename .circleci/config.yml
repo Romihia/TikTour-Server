@@ -19,12 +19,15 @@ jobs:
           command: cd frontend
       - run:
           name: install frontend dependencies
+          command: cd frontend
           command: npm install --legacy-peer-deps
       - run:
           name: run frontend tests
+          command: cd frontend
           command: npm run test
       - run:
           name: run frontend linter
+          command: cd frontend
           command: npm run lint
 
   build-test-lint-backend:
@@ -36,10 +39,13 @@ jobs:
           command: cd backend
       - run:
           name: install backend dependencies
+          command: cd backend
           command: npm install
       - run:
           name: run backend tests
+          command: cd backend
           command: npm run test
       - run:
           name: run backend linter
+          command: cd backend
           command: npm run lint
