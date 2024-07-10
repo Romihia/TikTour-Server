@@ -10,8 +10,8 @@ jobs:
     environment:
       JEST_JUNIT_OUTPUT_DIR: ./test-results/
     steps:
-      - checkout
-        path: ~/project
+      - checkout:
+          path: ~/project
       - node/install-packages:
           pkg-manager: npm
       - run:
@@ -34,8 +34,8 @@ jobs:
     environment:
       JEST_JUNIT_OUTPUT_DIR: ./test-results/
     steps:
-      - checkout
-        path: ~/project
+      - checkout:
+          path: ~/project
       - run:
           name: Change to backend directory
           command: cd backend
