@@ -1,19 +1,10 @@
-const chai = require('chai');
-const chaiHttp = require('chai-http');
-const server = require('../server');
-const should = chai.should();
+import { expect } from "chai";
 
-chai.use(chaiHttp);
-
-describe('GET /', () => {
-  it('should return Hello World!', (done) => {
-    chai.request(server)
-      .get('/')
-      .end((err, res) => {
-        res.should.have.status(200);
-        res.text.should.equal('Hello World!');
-        done();
-      });
-  });
+describe("stam test suite", () => {
+    describe("Test array get sorted", () => {
+        it("should sort array by name", () => {
+            const names = ["a", "c", "v", "b", "a"];
+            expect(names.sort()).to.deep.equal(['a', 'a', 'b', 'c', 'v']);
+        });
+    });
 });
-  

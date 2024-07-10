@@ -9,6 +9,7 @@
     "test": "mocha tests/*.spec.js",
     "lint": "eslint src/*"
   },
+  "type": "module",
   "dependencies": {
     "express": "^4.19.2"
   },
