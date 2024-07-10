@@ -1,13 +1,11 @@
 {
-  "name": "app",
+  "name": "frontend",
   "version": "0.1.0",
   "private": true,
   "dependencies": {
     "@testing-library/jest-dom": "^5.17.0",
+    "@testing-library/react": "^13.4.0",
     "@testing-library/user-event": "^13.5.0",
-    "cors": "^2.8.5",
-    "dotenv": "^16.4.5",
-    "nodemon": "^3.1.4",
     "react": "^18.3.1",
     "react-dom": "^18.3.1",
     "react-scripts": "5.0.1",
@@ -18,7 +16,7 @@
     "build": "react-scripts build",
     "test": "react-scripts test",
     "eject": "react-scripts eject",
-    "lint": "eslint src/*"
+    "lint": "eslint src/*.js"
   },
   "eslintConfig": {
     "extends": [
@@ -39,8 +37,15 @@
     ]
   },
   "devDependencies": {
-    "@testing-library/react": "^16.0.0",
-    "eslint": "^9.6.0",
-    "jest": "^27.5.1"
+    "@eslint/compat": "^1.1.0",
+    "@types/chai": "^4.3.16",
+    "@types/mocha": "^10.0.7",
+    "chai": "^5.1.1",
+    "eslint": "^8.57.0",
+    "eslint-plugin-react": "^7.34.3",
+    "eslint-plugin-react-hooks": "^4.6.2",
+    "globals": "^15.8.0",
+    "mocha": "^10.6.0",
+    "nodemon": "^3.1.4"
   }
 }
