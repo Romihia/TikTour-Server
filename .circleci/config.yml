@@ -18,7 +18,7 @@ jobs:
           command: npm install jest-junit
       - run:
           name: Run frontend tests
-          command: npm test 
+          command: npm test --ci --runInBand --reporters=default --reporters=jest-junit
       - run:
           name: Run frontend linter
           command: npm run lint
@@ -39,7 +39,7 @@ jobs:
           command: npm install jest-junit
       - run:
           name: Run backend tests
-          command: npm test 
+          command: npm test --ci --runInBand --reporters=default --reporters=jest-junit
       - run:
           name: Run backend linter
           command: npm run lint
