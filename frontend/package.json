@@ -13,7 +13,7 @@
   "scripts": {
     "start": "react-scripts start",
     "build": "react-scripts build",
-    "test": "react-scripts test --testPathPattern=frontend/test",
+    "test": "react-scripts test",
     "eject": "react-scripts eject",
     "lint": "eslint src/*.js --ignore-pattern src/*.test.js"
   },
