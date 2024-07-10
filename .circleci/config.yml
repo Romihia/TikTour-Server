@@ -11,6 +11,9 @@ jobs:
       JEST_JUNIT_OUTPUT_DIR: ./test-results/
     steps:
       - checkout
+      - run:
+          name: Change to frontend directory
+          command: cd frontend
       - node/install-packages:
           pkg-manager: npm
       - run:
@@ -19,7 +22,7 @@ jobs:
           name: Run frontend tests
           command: npm test -- --ci --reporters=default --reporters=jest-junit
       - run:
-          name: run frontend linter
+          name: Run frontend linter
           command: npm run lint
       - store_test_results:
           path: ./test-results/
@@ -29,6 +32,9 @@ jobs:
     working_directory: ~/project/frontend
     steps:
       - checkout
+      - run:
+          name: Change to frontend directory
+          command: cd frontend
       - node/install-packages:
           pkg-manager: npm
       - run:
@@ -50,6 +56,9 @@ jobs:
       JEST_JUNIT_OUTPUT_DIR: ./test-results/
     steps:
       - checkout
+      - run:
+          name: Change to backend directory
+          command: cd backend
       - node/install-packages:
           pkg-manager: npm
       - run:
@@ -58,7 +67,7 @@ jobs:
           name: Run backend tests
           command: npm test -- --ci --reporters=default --reporters=jest-junit
       - run:
-          name: run backend linter
+          name: Run backend linter
           command: npm run lint
       - store_test_results:
           path: ./test-results/
@@ -68,6 +77,9 @@ jobs:
     working_directory: ~/project/backend
     steps:
       - checkout
+      - run:
+          name: Change to backend directory
+          command: cd backend
       - node/install-packages:
           pkg-manager: npm
       - run:
