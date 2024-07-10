@@ -24,7 +24,6 @@ module.exports = {
     },
   },
   rules: {
-    quotes: ['error', 'single'],
-    semi: ['error', 'always'],
+    // You can add specific ESLint rules here if needed
   },
 };
