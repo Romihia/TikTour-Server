@@ -26,9 +26,6 @@ jobs:
       - run:
           name: run frontend linter
           command: npm run lint
-      # - run:
-      #     name: deploy frontend
-      #     command: curl "https://api.render.com/deploy/srv-cq6iulcs1f4s73e4df0g?key=qyy55YltldM"
 
   build-test-lint-backend:
     executor: node/default
@@ -46,6 +43,3 @@ jobs:
       - run:
           name: run backend linter
           command: npm run lint
-      # - run:
-      #     name: deploy backend
-      #     command: curl "https://api.render.com/deploy/srv-cq6iulcs1f4s73e4df0g?key=qyy55YltldM"
