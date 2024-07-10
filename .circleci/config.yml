@@ -3,49 +3,51 @@ version: 2.1
 orbs:
   node: circleci/node@5
 
-workflows:
-  my-workflow:
-    jobs:
-      - build-test-lint-frontend
-      - build-test-lint-backend
-
 jobs:
-  build-test-lint-frontend:
+  test-frontend:
     executor: node/default
+    working_directory: ~/project/frontend
+    environment:
+      JEST_JUNIT_OUTPUT_DIR: ./test-results/
     steps:
       - checkout
+      - node/install-packages:
+          pkg-manager: npm
       - run:
-          name: change to frontend directory
-          command: cd frontend
+          command: npm install jest-junit
       - run:
-          name: install frontend dependencies
-          command: cd frontend
-          command: npm install --legacy-peer-deps
+          name: Run frontend tests
+          command: npm run test --ci --runInBand --reporters=default --reporters=jest-junit
       - run:
-          name: run frontend tests
-          command: cd frontend
-          command: npm run test
-      - run:
-          name: run frontend linter
-          command: cd frontend
+          name: run linter
           command: npm run lint
+      - store_test_results:
+          path: ./test-results/
 
-  build-test-lint-backend:
+  test-backend:
     executor: node/default
+    working_directory: ~/project/backend
+    environment:
+      JEST_JUNIT_OUTPUT_DIR: ./test-results/
     steps:
       - checkout
+      - node/install-packages:
+          pkg-manager: npm
       - run:
-          name: change to backend directory
-          command: cd backend
+          command: npm install jest-junit
       - run:
-          name: install backend dependencies
-          command: cd backend
-          command: npm install
+          name: Run backend tests
+          command: npm run test --ci --runInBand --reporters=default --reporters=jest-junit
       - run:
-          name: run backend tests
-          command: cd backend
-          command: npm run test
-      - run:
-          name: run backend linter
-          command: cd backend
+          name: run linter
           command: npm run lint
+      - store_test_results:
+          path: ./test-results/
+
+workflows:
+  build-and-test:
+    jobs:
+      - test-frontend
+      - test-backend:
+          requires:
+            - test-frontend
