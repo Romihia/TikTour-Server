@@ -33,23 +33,17 @@ jobs:
     steps:
       - checkout:
           path: ~/project
-      - node/install-packages:
-          pkg-manager: npm
       - run:
-          command: npm install jest-junit
+          name: install app dependencies
+          command: npm install --legacy-peer-deps
       - run:
-          name: Run backend tests
-          command: npm test --ci --runInBand --reporters=default --reporters=jest-junit
+          name: run tests
+          command: npm run test
       - run:
-          name: Run backend linter
+          name: run linter
           command: npm run lint
-      - store_test_results:
-          path: ./test-results/
-
 workflows:
   build-and-test:
     jobs:
       - test-frontend
-      - test-backend:
-          requires:
-            - test-frontend
+      - test-backend
