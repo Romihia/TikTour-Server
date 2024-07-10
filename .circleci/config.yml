@@ -11,7 +11,7 @@ jobs:
       JEST_JUNIT_OUTPUT_DIR: ./test-results/
     steps:
       - checkout
-          path: ~/project
+        path: ~/project
 
       - node/install-packages:
           pkg-manager: npm
@@ -35,7 +35,7 @@ jobs:
     working_directory: ~/project/frontend
     steps:
       - checkout
-          path: ~/project
+        path: ~/project
       - run:
           name: Change to frontend directory
           command: cd frontend
@@ -60,7 +60,7 @@ jobs:
       JEST_JUNIT_OUTPUT_DIR: ./test-results/
     steps:
       - checkout
-          path: ~/project
+        path: ~/project
       - run:
           name: Change to backend directory
           command: cd backend
@@ -82,7 +82,7 @@ jobs:
     working_directory: ~/project/backend
     steps:
       - checkout
-          path: ~/project
+        path: ~/project
       - run:
           name: Change to backend directory
           command: cd backend
