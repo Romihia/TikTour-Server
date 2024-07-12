@@ -30,13 +30,9 @@ jobs:
     working_directory: ~/project/backend
     environment:
       JEST_JUNIT_OUTPUT_DIR: ./test-results/
-      NODE_ENV: test
     steps:
       - checkout:
           path: ~/project
-      - run:
-          name: Copy .env file to backend directory
-          command: cp ~/project/backend/tests/.env ~/project/backend/.env
       - run:
           name: install app dependencies
           command: npm install --legacy-peer-deps
@@ -46,7 +42,6 @@ jobs:
       - run:
           name: run linter
           command: npm run lint
-
 workflows:
   build-and-test:
     jobs:
