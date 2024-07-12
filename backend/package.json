@@ -8,7 +8,7 @@
     "start": "nodemon index.js",
     "dev": "nodemon index.js",
     "test": "mocha tests/*.js",
-    "lint": "eslint src/**/*.js"
+    "lint": "eslint src/*"
   },
   "dependencies": {
     "bcrypt": "^5.1.0",
