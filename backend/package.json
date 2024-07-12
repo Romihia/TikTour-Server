@@ -7,7 +7,7 @@
   "scripts": {
     "start": "nodemon index.js",
     "dev": "nodemon index.js",
-    "test": "mocha tests/*",
+    "test": "mocha tests/*.js",
     "lint": "eslint src/*"
   },
   "dependencies": {
