@@ -1,0 +1,8 @@
+## mongodb database url
+MONGO_URL=
+
+## port number of the server
+port=3001
+
+## jwt secret 
+JWT_SECRET=SDCMSDJCNsjkvn44235nj2j@44mk5%3A

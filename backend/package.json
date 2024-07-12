@@ -7,7 +7,7 @@
   "scripts": {
     "start": "nodemon index.js",
     "dev": "nodemon index.js",
-    "test": "mocha tests/*.spec.js",
+    "test": "mocha tests/*",
     "lint": "eslint src/*"
   },
   "dependencies": {
@@ -29,6 +29,7 @@
     "@types/chai": "^4.3.16",
     "@types/mocha": "^10.0.7",
     "chai": "^5.1.1",
+    "chai-http": "^4.4.0",
     "eslint": "^9.6.0",
     "eslint-plugin-react": "^7.34.3",
     "globals": "^15.8.0",
