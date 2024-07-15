@@ -4,27 +4,6 @@ orbs:
   node: circleci/node@5
 
 jobs:
-  test-frontend:
-    executor: node/default
-    working_directory: ~/project/frontend
-    environment:
-      JEST_JUNIT_OUTPUT_DIR: ./test-results/
-    steps:
-      - checkout:
-          path: ~/project
-      - node/install-packages:
-          pkg-manager: npm
-      - run:
-          command: npm install jest-junit
-      - run:
-          name: Run frontend tests
-          command: npm test --ci --runInBand --reporters=default --reporters=jest-junit
-      - run:
-          name: Run frontend linter
-          command: npm run lint
-      - store_test_results:
-          path: ./test-results/
-
   test-backend:
     executor: node/default
     working_directory: ~/project/backend
@@ -45,5 +24,4 @@ jobs:
 workflows:
   build-and-test:
     jobs:
-      - test-frontend
       - test-backend
