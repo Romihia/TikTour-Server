@@ -38,7 +38,7 @@ The backend of the project handles the core business logic of the application, i
 
 3. **Install Dependencies**: Before running the project, install all dependencies specified in `package.json`.
  ```bash
- npm install
+ npm install --force
  ```
 
 4. **Start the Server**: To run the server, use the following command:
