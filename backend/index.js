@@ -52,12 +52,12 @@ app.get('/', (req, res) => {
 });
 /* ROUTES WITH FILES */
 app.get('/about', (req, res) => {
-  const filePath = path.join(__dirname, 'about.md');
+  const filePath = path.join(__dirname, 'about.html');
   
   fs.readFile(filePath, 'utf8', (err, data) => {
     if (err) {
       console.error('Error reading file:', err);
-      res.status(500).send('Error reading about.md');
+      res.status(500).send('Error reading about.html');
       return;
     }
     
