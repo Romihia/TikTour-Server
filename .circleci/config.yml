@@ -31,9 +31,13 @@ jobs:
           command: curl "https://api.render.com/deploy/srv-cqdo77ogph6c73a9sr50?key=bf3TB6lfK-g"
 
 workflows:
-  build-and-test:
+  version: 2
+  test-and-deploy:
     jobs:
       - test-backend
       - deploy-backend:
           requires:
             - test-backend
+          filters:
+            branches:
+              only: production
