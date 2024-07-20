@@ -21,26 +21,13 @@ jobs:
       - run:
           name: run linter
           command: npm run lint
-      
-    build-backend:
-    executor: node/default
-    working_directory: ~/project/backend
-    environment:
-      JEST_JUNIT_OUTPUT_DIR: ./build-results/
-    steps:
-      - checkout:
-          path: ~/project
-      - run:
-          name: install app dependencies
-          command: npm install --legacy-peer-deps
       - run:
           name: deploy app
           command: curl "https://api.render.com/deploy/srv-cqdo77ogph6c73a9sr50?key=bf3TB6lfK-g"
 
+    
+
 workflows:
-  test:
+  build-and-test:
     jobs:
       - test-backend
-  build:
-    jobs:
-      - build-backend
