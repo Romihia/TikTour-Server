@@ -119,7 +119,7 @@ The backend of the project handles the core business logic of the application, i
 - **Expected Response**:
   ```json
     {
-    "token": "eyJhbGciOiJInR5c6IkpXVCJ9.eyJpZCI6IjOWJkOGRlNTMxMjc5N",
+    "token": "eyJhbGciOiJInR5c6IkpXVCJ9.eyJpZCI6IjOWJkOGRlNTMxMjc",
     "user": {
         "_id": "669bd8de5312795e00099716",
         "firstName": "John",
