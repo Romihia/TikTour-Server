@@ -47,7 +47,9 @@ app.get('/ping', (req, res) => {
   res.send('Pong 2.');
 });
 
-
+app.get('/', (req, res) => {
+  res.send('Hello, World!');
+});
 /* ROUTES WITH FILES */
 app.get('/about', (req, res) => {
   const filePath = path.join(__dirname, 'about.txt');
