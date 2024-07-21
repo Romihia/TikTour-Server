@@ -21,6 +21,9 @@ jobs:
       - run:
           name: run linter
           command: npm run lint
+      - run:
+         name: deploy app - stage 
+         command: curl "https://api.render.com/deploy/srv-cqelblggph6c73as6pn0?key=R-Bn3VmmFIk"
 
   deploy-backend:
     executor: node/default
