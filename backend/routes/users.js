@@ -1,8 +1,9 @@
 import express from "express";
 import {
   getUser,
-  getUserFriends,
-  addRemoveFriend,
+  getUserFollowers,
+  getUserFollowing,
+  addRemoveFollower,
   updateUser,
   updatePassword,
   updateUserPicture,
@@ -13,13 +14,14 @@ const router = express.Router();
 
 /* READ */
 router.get("/:id", verifyToken, getUser);
-router.get("/:id/friends", verifyToken, getUserFriends);
+router.get("/:id/followers", verifyToken, getUserFollowers);
+router.get("/:id/following", verifyToken, getUserFollowing);
 
 /* UPDATE */
-router.patch("/:id/:friendId", verifyToken, addRemoveFriend);
+router.patch("/:id/:followerId", verifyToken, addRemoveFollower);
 
 /* UPDATE USER DETAILS */
-router.patch("/:updateuser", verifyToken, updateUser);
+router.patch("/:id", verifyToken, updateUser);
 
 /* UPDATE USER PASSWORD */
 router.patch("/:id/password", verifyToken, updatePassword);
