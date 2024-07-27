@@ -33,18 +33,33 @@ const UserSchema = new mongoose.Schema(
     },
     picturePath: {
       type: String,
+      required: false,
       default: "",
     },
     friends: {
       type: Array,
+      required: false,
       default: [],
     },
     dateOfBirth: {
       type: Date,
-      required: true,
+      required: false,
     },
-    location: String,
-    rank: String,
+    location: {
+    type: String,
+    required: false,
+    default: "",
+    },
+    rank:{
+    type: String,
+    required: false,
+    default: "",
+    },
+    isVerified: {
+      type: Boolean,
+      required: false,
+      default: false,
+    },
   },
   { timestamps: true }
 );
