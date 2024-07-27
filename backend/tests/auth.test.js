@@ -1,29 +1,30 @@
-// import { expect } from 'chai';
-// import mongoose from 'mongoose';
-// import dotenv from 'dotenv';
+import request from 'supertest';
+import assert from 'assert';
+import app from '../index.js';
 
-// dotenv.config();
-// const mongoUrl = process.env.MONGO_URL;
+describe('Auth API', function() {
+  this.timeout(5000); // Increase timeout to 5000ms
 
-
-// describe('MongoDB Connection', () => {
-//   before((done) => {
-//     mongoose.connect(mongoUrl, {
-//       useNewUrlParser: true,
-//       useUnifiedTopology: true,
-//     }, (err) => {
-//       if (err) {
-//         console.error('MongoDB connection error:', err);
-//       }
-//       done();
-//     });
-//   });
-
-//   after((done) => {
-//     mongoose.connection.close(() => done());
-//   });
-
-//   it('should connect to MongoDB', () => {
-//     expect(mongoose.connection.readyState).to.equal(1); // 1 means connected
-//   });
-// });
+  it('should register a new user', (done) => {
+    request(app)
+      .post('/auth/register')
+      .send({
+        firstName: "max",
+        lastName: "tes",
+        email: "testEmail@testEmail.com",
+        password: "123456789",
+        location: "Ashkelon",
+        username: "testUser",
+        dateOfBirth: "1990-01-01",
+        rank: "1",
+        isVerified: true
+      })
+      .expect(201)
+      .end((err, res) => {
+        if (err) return done(err);
+        assert.strictEqual(res.body.email, "testEmail@testEmail.com");
+        assert.strictEqual(res.body.username, "testUser");
+        done();
+      });
+  });
+});
