@@ -6,6 +6,7 @@ import {
   updateUser,
   updatePassword,
   updateUserPicture,
+  deleteUser
 } from "../controllers/users.js";
 import { verifyToken } from "../middleware/auth.js";
 
@@ -26,5 +27,9 @@ router.patch("/:id/password", verifyToken, updatePassword);
 
 /* UPDATE USER PICTURE */
 router.patch("/:id/picture", verifyToken, updateUserPicture);
+
+/* DELETE USER */
+router.delete("/:id", verifyToken, deleteUser); // Added delete user route
+
 
 export default router;
