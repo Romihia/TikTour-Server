@@ -1,6 +1,6 @@
 import nodemailer from 'nodemailer';
 
-const sendEmail = async (email, subject, html) => {
+const sendEmail = async (email,resetLink) => {
   const transporter = nodemailer.createTransport({
     service: 'gmail',
     auth: {
@@ -13,10 +13,17 @@ const sendEmail = async (email, subject, html) => {
     from: process.env.EMAIL,
     to: email,
     subject: "Password Reset",
-    html: `<p>You requested for a password reset</p><p>Click this <a href="${resetLink}">link</a> to reset your password</p>`,
+    text: `Click the following link to reset your password: ${resetLink}`,
+    html: `<p>Click the following link to reset your password: <a href="${resetLink}">${resetLink}</a></p>`,
   };
 
-  await transporter.sendMail(mailOptions);
+  try {
+    await transporter.sendMail(mailOptions);
+    console.log('Password reset email sent');
+  } catch (error) {
+    console.error('Error sending password reset email:', error);
+    throw new Error('Error sending password reset email');
+  }
 };
 
 export default sendEmail;
