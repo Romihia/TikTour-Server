@@ -1,7 +1,7 @@
 import bcrypt from "bcrypt";
 import jwt from "jsonwebtoken";
 import User from "../models/User.js";
-import sendEmail from "../utils/email.js";
+import sendPasswordResetEmail from "../utils/email.js";
 
 /* REGISTER USER */
 export const register = async (req, res) => {
@@ -104,10 +104,11 @@ export const requestPasswordReset = async (req, res) => {
     await sendPasswordResetEmail(user.email, resetLink);
     res.status(200).json({ message: "Password reset link sent to your email" });
   } catch (error) {
+    console.error('Error sending password reset email:', error);
     res.status(500).json({ message: error.message });
   }
 };
-/* PASSWORD RESET */
+/* RESET PASSWORD */
 export const resetPassword = async (req, res) => {
   const { token, newPassword } = req.body;
   try {
