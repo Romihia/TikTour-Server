@@ -35,7 +35,11 @@ const UserSchema = new mongoose.Schema(
       default: "user.png",
       required: false,
     },
-    friends: {
+    followers: {
+      type: Array,
+      default: [],
+    },
+    following: {
       type: Array,
       required: false,
       default: [],
