@@ -71,4 +71,8 @@ describe('Auth API', function() {
           .end(done);
       });
   });
+
+  after((done) => {
+    mongoose.connection.close(done);
+  });
 });
