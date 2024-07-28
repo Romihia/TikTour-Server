@@ -1,3 +1,4 @@
+// backend/index.js
 import express from 'express';
 import bodyParser from 'body-parser';
 import mongoose from 'mongoose';
@@ -15,8 +16,6 @@ import postRoutes from './routes/posts.js';
 import { register } from './controllers/auth.js';
 import { createPost } from './controllers/posts.js';
 import { verifyToken } from './middleware/auth.js';
-
-
 
 /* CONFIGURATIONS */
 const __filename = fileURLToPath(import.meta.url);
@@ -83,7 +82,10 @@ mongoose
     useUnifiedTopology: true,
   })
   .then(() => {
-    app.listen(PORT, () => console.log(`Server Port: ${PORT}`));
-
+    if (process.env.NODE_ENV !== 'test') {
+      app.listen(PORT, () => console.log(`Server Port: ${PORT}`));
+    }
   })
   .catch((error) => console.log(`${error} did not connect`));
+
+export default app;
