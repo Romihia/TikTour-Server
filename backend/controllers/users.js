@@ -60,7 +60,9 @@ export const addRemoveFollow = async (req, res) => {
     if (!user || !follower) {
       return res.status(404).json({ message: "User(s) not found" });
     }
-
+    if(userId == id){
+    return res.status(404).json({ message: "Its not possible to follow yourself." });
+    }
     // Add or remove follower
     if (user.following.includes(userId)) {
       user.following = user.following.filter((curId) => curId !== userId);
