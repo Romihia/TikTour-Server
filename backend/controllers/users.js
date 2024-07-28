@@ -51,36 +51,44 @@ export const getUserFollowing = async (req, res) => {
 };
 
 /* UPDATE */
-export const addRemoveFollower = async (req, res) => {
+export const addRemoveFollow = async (req, res) => {
   try {
-    const { id, followerId } = req.params;
+    const { id, userId } = req.params;  // 'id' is the logged-in user, 'userId' is the user to follow/unfollow
     const user = await User.findById(id);
-    const follower = await User.findById(followerId);
+    const follower = await User.findById(userId);
 
-    if (user.followers.includes(followerId)) {
-      user.followers = user.followers.filter((id) => id !== followerId);
-      follower.following = follower.following.filter((id) => id !== id);
-    } else {
-      user.followers.push(followerId);
-      follower.following.push(id);
+    if (!user || !follower) {
+      return res.status(404).json({ message: "User(s) not found" });
     }
+
+    // Add or remove follower
+    if (user.following.includes(userId)) {
+      user.following = user.following.filter((curId) => curId !== userId);
+      follower.followers = follower.followers.filter((curId) => curId !== id);
+    } else {
+      user.following.push(userId);
+      follower.followers.push(id);
+    }
+
     await user.save();
     await follower.save();
 
-    const updatedFollowers = await Promise.all(
-      user.followers.map((id) => User.findById(id))
+    // Respond with the updated following list for the user
+    const updatedFollowing = await Promise.all(
+      user.following.map((id) => User.findById(id))
     );
-    const formattedFollowers = updatedFollowers.map(
+    const formattedFollowing = updatedFollowing.map(
       ({ _id, firstName, lastName, location, picturePath }) => {
         return { _id, firstName, lastName, location, picturePath };
       }
     );
 
-    res.status(200).json(formattedFollowers);
+    res.status(200).json(formattedFollowing);
   } catch (err) {
     res.status(404).json({ message: err.message });
   }
 };
+
 
 /* UPDATE USER DETAILS */
 export const updateUser = async (req, res) => {

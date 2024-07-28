@@ -3,7 +3,7 @@ import {
   getUser,
   getUserFollowers,
   getUserFollowing,
-  addRemoveFollower,
+  addRemoveFollow,
   updateUser,
   updatePassword,
   updateUserPicture,
@@ -18,7 +18,7 @@ router.get("/:id/followers", verifyToken, getUserFollowers);
 router.get("/:id/following", verifyToken, getUserFollowing);
 
 /* UPDATE */
-router.patch("/:id/:followerId", verifyToken, addRemoveFollower);
+router.patch("/:id/:userId", verifyToken, addRemoveFollow);
 
 /* UPDATE USER DETAILS */
 router.patch("/:id", verifyToken, updateUser);
