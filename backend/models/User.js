@@ -5,30 +5,39 @@ const UserSchema = new mongoose.Schema(
     firstName: {
       type: String,
       required: false,
+      min: 1,
       max: 50,
+      match: /^[A-Za-z]+$/
     },
     lastName: {
       type: String,
       required: false,
+      min: 1,
       max: 50,
+      match: /^[A-Za-z]+$/
     },
     email: {
       type: String,
       required: true,
-      max: 100,
+      max: 150,
       unique: true,
+      // match: /^[^\s@]+@[^\s@]+\.[^\s@]+$/
     },
     username: {
       type: String,
       required: true,
+      min: 1,
       max: 50,
       unique: true,
+      match: /^[A-Za-z\d]+$/
     },
     password: {
       type: String,
       required: true,
       min: 8,
       max: 50,
+      // no work beacuse hashing
+      // match: /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)[A-Za-z\d!@#$%^&*]+$/
     },
     picturePath: {
       type: String,
@@ -51,7 +60,9 @@ const UserSchema = new mongoose.Schema(
     location: {
     type: String,
     required: false,
-    default: "",
+    min: 1,
+    max: 50,
+    // match: /^[A-Za-z]+$/
     },
     rank:{
     type: String,
