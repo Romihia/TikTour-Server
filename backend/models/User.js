@@ -41,10 +41,14 @@ const UserSchema = new mongoose.Schema(
     },
     picturePath: {
       type: String,
-      default: "",
+      default: "user.png",
       required: false,
     },
-    friends: {
+    followers: {
+      type: Array,
+      default: [],
+    },
+    following: {
       type: Array,
       required: false,
       default: [],
