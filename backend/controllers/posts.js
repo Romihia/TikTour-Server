@@ -10,6 +10,7 @@ export const createPost = async (req, res) => {
       userId,
       firstName: user.firstName,
       lastName: user.lastName,
+      userName: user.username,
       location: user.location,
       description,
       userPicturePath: user.picturePath,
@@ -18,7 +19,7 @@ export const createPost = async (req, res) => {
       dislikes: {},
     });
     await newPost.save();
-
+    
     const post = await Post.find();
     res.status(201).json(post);
   } catch (err) {
