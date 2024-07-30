@@ -2,7 +2,7 @@
 import nodemailer from 'nodemailer';
 
 
-const sendEmail = async (email, resetLink, type) => {
+const sendEmail = async (email, link, type) => {
   let subject = "";
   let text = "";
   const transporter = nodemailer.createTransport({
@@ -15,10 +15,10 @@ const sendEmail = async (email, resetLink, type) => {
   
   if (type === 'PasswordReset') {
     subject = "Password Reset";
-    text = `Click the following link to reset your password: ${resetLink}`;
+    text = `Click the following link to reset your password: ${link}`;
   } else if (type === 'Activation') { 
     subject = "Account Activation";
-    text = `Click the following link to activate your account: ${resetLink}`;
+    text = `Click the following link to activate your account: ${link}`;
   }
 
   const mailOptions = {

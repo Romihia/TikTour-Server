@@ -3,6 +3,13 @@ import jwt from "jsonwebtoken";
 import User from "../models/User.js";
 import sendEmail from "../utils/sendEmail.js";
 
+const cookieOptions = {
+  httpOnly: true,
+  secure: process.env.NODE_ENV === 'production', // Set secure flag in production
+  sameSite: 'Strict',
+  maxAge: 24 * 60 * 60 * 1000 // 1 day
+};
+
 /* REGISTER USER */
 export const register = async (req, res) => {
   try {
@@ -31,7 +38,16 @@ export const register = async (req, res) => {
       viewedProfile: Math.floor(Math.random() * 10000),
       impressions: Math.floor(Math.random() * 10000),
     });
-
+    
+    // Check unique fileds
+    let uniqueFiled = await User.findOne({ username: newUser.username });
+    if(uniqueFiled){
+      throw new Error(`"User name already exist.`);
+    }
+    uniqueFiled = await User.findOne({ email: newUser.email });
+    if(uniqueFiled){
+      throw new Error(`"Email already exist.`);
+    }
     const savedUser = await newUser.save();
 
     // Create a verification token
@@ -57,14 +73,14 @@ export const login = async (req, res) => {
       user = await User.findOne({ username: identifier });
     }
     if (!user) {
-      return res.status(400).json({ msg: "User does not exist. " });
+      return res.status(400).json({ msg: "User does not exist. Incorrect email or username. " });
     }
     if (!user.isVerified) {
       return res.status(400).json({ msg: "Please verify your email first." });
     }
     const isMatch = await bcrypt.compare(password, user.password);
     if (!isMatch) {
-      return res.status(400).json({ msg: "Invalid credentials. " });
+      return res.status(400).json({ msg: "Invalid password. " });
     }
     const token = jwt.sign({ id: user._id }, process.env.JWT_SECRET);
     delete user.password;
