@@ -32,6 +32,10 @@ const postSchema = mongoose.Schema(
       of: Boolean,
       default: {},
     },
+    hashtags: {
+      type: [String], // Array of strings to store hashtags
+      default: [], // Default to an empty array if no hashtags are provided
+    },
   },
   { timestamps: true }
 );
@@ -39,4 +43,3 @@ const postSchema = mongoose.Schema(
 const Post = mongoose.model("Post", postSchema);
 
 export default Post;
-
