@@ -2,7 +2,7 @@
 MONGO_URL=
 
 #port number of the server
-port=3001
+PORT=3001
 
 #jwt secret
 JWT_SECRET=
