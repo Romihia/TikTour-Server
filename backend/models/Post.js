@@ -33,8 +33,8 @@ const postSchema = mongoose.Schema(
       default: {},
     },
     hashtags: {
-      type: [String], // Array of strings to store hashtags
-      default: [], // Default to an empty array if no hashtags are provided
+      type: [], 
+      default: [], 
     },
   },
   { timestamps: true }
