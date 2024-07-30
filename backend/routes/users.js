@@ -7,7 +7,9 @@ import {
   updateUser,
   updatePassword,
   updateUserPicture,
-  deleteUser
+  deleteUser,
+  getTotalLikes,
+  getTopLiker
 } from "../controllers/users.js";
 import { verifyToken } from "../middleware/auth.js";
 
@@ -17,6 +19,9 @@ const router = express.Router();
 router.get("/:id", verifyToken, getUser);
 router.get("/:id/followers", verifyToken, getUserFollowers);
 router.get("/:id/following", verifyToken, getUserFollowing);
+router.get("/:id/totalLikes", verifyToken, getTotalLikes);
+router.get("/:id/topLiker", verifyToken, getTopLiker);
+
 
 /* UPDATE */
 router.patch("/:id/:userId", verifyToken, addRemoveFollow);
@@ -32,6 +37,8 @@ router.patch("/:id/picture", verifyToken, updateUserPicture);
 
 /* DELETE USER */
 router.delete("/:id", verifyToken, deleteUser); // Added delete user route
+
+
 
 
 export default router;
