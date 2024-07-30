@@ -1,4 +1,5 @@
 import User from "../models/User.js";
+import Post from "../models/Post.js";
 import bcrypt from "bcrypt";
 
 /* READ */
@@ -158,5 +159,61 @@ export const deleteUser = async (req, res) => {
     res.status(200).json({ msg: "User deleted successfully" });
   } catch (err) {
     res.status(500).json({ error: err.message });
+  }
+};
+
+export const getTotalLikes = async (req, res) => {
+  try {
+    const { id } = req.params;
+
+    const posts = await Post.find({ userId: id });
+
+    const totalLikes = posts.reduce((acc, post) => acc + post.likes.size, 0);
+    res.status(200).json({ totalLikes });
+  } catch (err) {
+    res.status(500).json({ message: err.message });
+  }
+};
+
+
+export const getTopLiker = async (req, res) => {
+  try {
+    const { id } = req.params;
+    const user = await User.findById(id);
+
+    if (!user) {
+      return res.status(404).json({ message: "User not found" });
+    }
+
+    // Find all posts of the user
+    const posts = await Post.find({ userId: id });
+    const likerCounts = {};
+
+    // Process each post
+    for (const post of posts) {
+      // Process each liker of the post
+      for (const liker of post.likes.keys()) {
+        // Update the likerCounts dictionary
+        if (likerCounts[liker]) {
+          likerCounts[liker] += 1;
+        } else {
+          likerCounts[liker] = 1;
+        }
+      }
+    }
+
+    // Find the user with the maximum number of likes
+    const topLikerId = Object.keys(likerCounts).reduce((a, b) =>
+      likerCounts[a] > likerCounts[b] ? a : b
+    );
+
+    if (!topLikerId) {
+      return res.status(404).json({ message: "No likers found" });
+    }
+
+    const topLiker = await User.findById(topLikerId);
+    res.status(200).json({ topLiker, likeCount: likerCounts[topLikerId] });
+  } catch (err) {
+    res.status(500).json({ message: err.message });
   }
 };
