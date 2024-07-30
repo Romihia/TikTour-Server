@@ -3,6 +3,13 @@ import jwt from "jsonwebtoken";
 import User from "../models/User.js";
 import sendEmail from "../utils/sendEmail.js";
 
+const cookieOptions = {
+  httpOnly: true,
+  secure: process.env.NODE_ENV === 'production', // Set secure flag in production
+  sameSite: 'Strict',
+  maxAge: 24 * 60 * 60 * 1000 // 1 day
+};
+
 /* REGISTER USER */
 export const register = async (req, res) => {
   try {
@@ -31,7 +38,16 @@ export const register = async (req, res) => {
       viewedProfile: Math.floor(Math.random() * 10000),
       impressions: Math.floor(Math.random() * 10000),
     });
-
+    
+    // Check unique fileds
+    let uniqueFiled = await User.findOne({ username: newUser.username });
+    if(uniqueFiled){
+      throw new Error(`"User name already exist.`);
+    }
+    uniqueFiled = await User.findOne({ email: newUser.email });
+    if(uniqueFiled){
+      throw new Error(`"Email already exist.`);
+    }
     const savedUser = await newUser.save();
 
     // Create a verification token
