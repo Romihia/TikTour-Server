@@ -148,6 +148,7 @@ export const updateUserPicture = async (req, res) => {
     res.status(500).json({ error: error.message });
   }
 };
+
 /* DELETE USER */
 export const deleteUser = async (req, res) => {
   try {
