@@ -42,11 +42,11 @@ export const register = async (req, res) => {
     // Check unique fileds
     let uniqueFiled = await User.findOne({ username: newUser.username });
     if(uniqueFiled){
-      throw new Error(`"User name already exist.`);
+      throw new Error(`User name already exist.`);
     }
     uniqueFiled = await User.findOne({ email: newUser.email });
     if(uniqueFiled){
-      throw new Error(`"Email already exist.`);
+      throw new Error(`Email already exist.`);
     }
     const savedUser = await newUser.save();
 
