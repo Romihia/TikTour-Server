@@ -110,3 +110,29 @@ export const deletePost = async (req, res) => {
     res.status(500).json({ message: err.message });
   }
 };
+
+// Function to get posts from the current user and the users they follow
+export const getUserAndFollowingPosts = async (req, res) => {
+  try {
+    const { userId } = req.params;
+
+    // Find the current user
+    const currentUser = await User.findById(userId);
+
+    // Get the list of user IDs the current user is following
+    const followingIds = currentUser.following;
+
+    // Add the current user's ID to the list
+    followingIds.push(userId);
+
+    // Fetch posts from the current user and users they follow
+    const posts = await Post.find({ userId: { $in: followingIds } }).sort({ createdAt: -1 });
+
+    res.status(200).json(posts);
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+};
+
+
+
