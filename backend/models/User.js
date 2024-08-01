@@ -62,7 +62,7 @@ const UserSchema = new mongoose.Schema(
     required: false,
     min: 1,
     max: 50,
-    // match: /^[A-Za-z]+$/
+    match: /^[A-Za-z\s]+$/
     },
     rank:{
     type: String,
