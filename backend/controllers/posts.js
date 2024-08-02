@@ -64,14 +64,17 @@ export const updatePost = async (req, res) => {
 /* CREATE */
 export const createPost = async (req, res) => {
   try {
-    const { userId, description, location, hashtags } = req.body;
+    const { userId, sharedById, description, location, hashtags } = req.body;
     const user = await User.findById(userId);
     
+    console.log("req.body: ", req.body);
+
     // Handle image file if present
     const picturePath = req.file ? req.file.filename : '';
 
     const newPost = new Post({
       userId,
+      sharedById: sharedById,
       firstName: user.firstName,
       lastName: user.lastName,
       userName: user.username,
@@ -90,6 +93,7 @@ export const createPost = async (req, res) => {
     res.status(201).json(post);
   } catch (err) {
     res.status(409).json({ message: err.message });
+    console.log("Error on creating post.");
   }
 };
 
@@ -192,8 +196,13 @@ export const getUserAndFollowingPosts = async (req, res) => {
     followingIds.push(userId);
 
     // Fetch posts from the current user and users they follow
-    const posts = await Post.find({ userId: { $in: followingIds } }).sort({ createdAt: -1 });
-
+    const posts = await Post.find({
+      $or: [
+        { userId: { $in: followingIds } },
+        { sharedById: { $in: followingIds } }
+      ]
+    }).sort({ createdAt: -1 });
+    
     res.status(200).json(posts);
   } catch (err) {
     res.status(500).json({ error: err.message });
