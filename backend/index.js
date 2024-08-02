@@ -63,6 +63,19 @@ app.get('/about', (req, res) => {
   });
 });
 
+app.get('/terms', (req, res) => {
+  const filePath = path.join(__dirname, 'TikTour Terms and Conditions.html');
+  fs.readFile(filePath, 'utf8', (err, data) => {
+    if (err) {
+      console.error('Error reading file:', err);
+      res.status(500).send('Error reading TikTour Terms and Conditions.html');
+      return;
+    }
+    
+    res.send(data);
+  });
+});
+
 app.post('/auth/register', register);
 app.post('/posts', verifyToken, upload.single('picture'), createPost);
 

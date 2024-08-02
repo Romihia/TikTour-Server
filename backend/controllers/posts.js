@@ -1,32 +1,102 @@
 import Post from "../models/Post.js";
 import User from "../models/User.js";
+import path from 'path';
+import fs from 'fs';
+
+// Update a post
+export const updatePost = async (req, res) => {
+  console.log("req.body: ", req.body);
+  console.log("res.body: ", res.body);
+  try {
+    const id = req.body.id;
+    const { userId, description, location, hashtags } = req.body;
+
+    console.log("\n\n\n\n\n\n\nid: " + id);
+
+    // Find the post to update
+    const post = await Post.findById(id);
+    
+    if (!post) {
+      return res.status(404).json({ message: "Post not found" });
+    }
+
+    // Check if the authenticated user is the owner of the post
+    if (post.userId !== userId) {
+      return res.status(403).json({ message: "Unauthorized" });
+    }
+
+    // Handle image update
+    let picturePath;
+    if (req.body) {
+      // If a new image is uploaded, update the picturePath
+      picturePath = req.body.picturePath;
+      
+      // Optionally, delete the old image from the server
+      const oldPicturePath = post.picturePath;
+      if (oldPicturePath) {
+        fs.unlinkSync(path.join('public/assets', oldPicturePath));
+      }
+    } else {
+      // Retain the existing picturePath if no new image is uploaded
+      picturePath = post.picturePath;
+    }
+
+    // Update the post with new data
+    const updatedPost = await Post.findByIdAndUpdate(
+      id,
+      {
+        description: description || post.description,
+        location: location || post.location,
+        hashtags: hashtags || post.hashtags,
+        picturePath: picturePath || post.picturePath,
+      },
+      { new: true }
+    );
+    console.log("Updated post: "+updatedPost);
+
+    
+    res.status(200).json(updatedPost);
+  } catch (err) {
+    res.status(500).json({ message: err.message });
+  }
+};
 
 /* CREATE */
 export const createPost = async (req, res) => {
   try {
-    const { userId, description, picturePath } = req.body;
+    const { userId, sharedById, description, location, hashtags } = req.body;
     const user = await User.findById(userId);
+    
+    console.log("req.body: ", req.body);
+
+    // Handle image file if present
+    const picturePath = req.file ? req.file.filename : '';
+
     const newPost = new Post({
       userId,
+      sharedById: sharedById,
       firstName: user.firstName,
       lastName: user.lastName,
       userName: user.username,
-      location: req.body.location,
+      location,
       description,
       userPicturePath: user.picturePath,
       picturePath,
       likes: {},
       dislikes: {},
-      hashtags: req.body.hashtags,
+      hashtags,
     });
+
     await newPost.save();
 
     const post = await Post.find();
     res.status(201).json(post);
   } catch (err) {
     res.status(409).json({ message: err.message });
+    console.log("Error on creating post.");
   }
 };
+
 
 /* READ */
 export const getFeedPosts = async (req, res) => {
@@ -126,8 +196,13 @@ export const getUserAndFollowingPosts = async (req, res) => {
     followingIds.push(userId);
 
     // Fetch posts from the current user and users they follow
-    const posts = await Post.find({ userId: { $in: followingIds } }).sort({ createdAt: -1 });
-
+    const posts = await Post.find({
+      $or: [
+        { userId: { $in: followingIds } },
+        { sharedById: { $in: followingIds } }
+      ]
+    }).sort({ createdAt: -1 });
+    
     res.status(200).json(posts);
   } catch (err) {
     res.status(500).json({ error: err.message });
