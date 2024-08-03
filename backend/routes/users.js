@@ -10,7 +10,8 @@ import {
   deleteUser,
   getTotalLikes,
   getTopLiker,
-  getUserRank
+  getUserRank,
+  updateUserPrompt
 } from "../controllers/users.js";
 import { verifyToken } from "../middleware/auth.js";
 import User from "../models/User.js"
@@ -23,6 +24,9 @@ router.get("/:id/followers", verifyToken, getUserFollowers);
 router.get("/:id/following", verifyToken, getUserFollowing);
 router.get("/:id/totalLikes", verifyToken, getTotalLikes);
 router.get("/:id/topLiker", verifyToken, getTopLiker);
+
+/* UPDATE USER DETAILS IN PROMPT */
+router.post("/prompt/:username", verifyToken, updateUserPrompt);
 
 
 /* UPDATE */

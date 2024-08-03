@@ -114,6 +114,26 @@ export const updateUser = async (req, res) => {
   }
 };
 
+/* UPDATE USER Prompt */
+export const updateUserPrompt = async (req, res) => {
+  const { username } = req.params;
+  const { firstName, lastName, dateOfBirth, location, picturePath } = req.body;
+  console.log("firstName:", firstName, "lastName:", lastName, "dateOfBirth:", dateOfBirth, "location:", location, "profilePicture:", picturePath);
+
+  try {
+    //con picturePuth = picturePath.path
+    const updatedUser = await User.findOneAndUpdate(
+      { username },
+      { firstName, lastName, dateOfBirth, location, picturePath },
+      { new: true }
+    );
+    res.status(200).json(updatedUser);
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+};
+
+
 /* UPDATE USER PASSWORD */
 export const updatePassword = async (req, res) => {
   const { id } = req.params;

@@ -50,7 +50,7 @@ export const register = async (req, res) => {
     // Send verification email
     await sendEmail(savedUser.email, verificationLink, 'Activation');
 
-    res.status(201).json({ message: 'User registered successfully. Please check your email for activation link.', user: savedUser });
+    res.status(201).json({ message: 'User registered successfully. Please check your email for activation link.', user: savedUser,token: token });
   } catch (err) {
     res.status(500).json({ error: err.message });
   }
