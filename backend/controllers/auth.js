@@ -3,12 +3,7 @@ import jwt from "jsonwebtoken";
 import User from "../models/User.js";
 import sendEmail from "../utils/sendEmail.js";
 
-const cookieOptions = {
-  httpOnly: true,
-  secure: process.env.NODE_ENV === 'production', // Set secure flag in production
-  sameSite: 'Strict',
-  maxAge: 24 * 60 * 60 * 1000 // 1 day
-};
+
 
 /* REGISTER USER */
 export const register = async (req, res) => {
