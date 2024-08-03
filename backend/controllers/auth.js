@@ -64,29 +64,42 @@ export const register = async (req, res) => {
 /* LOGGING IN */
 export const login = async (req, res) => {
   try {
-    const { identifier, password } = req.body;
+    const { identifier, password, rememberMe } = req.body;  
 
     let user = await User.findOne({ email: identifier });
     if (!user) {
       user = await User.findOne({ username: identifier });
     }
     if (!user) {
-      return res.status(400).json({ msg: "User does not exist. Incorrect email or username. " });
+      return res.status(400).json({ msg: "User does not exist. Incorrect email or username." });
     }
     if (!user.isVerified) {
       return res.status(400).json({ msg: "Please verify your email first." });
     }
     const isMatch = await bcrypt.compare(password, user.password);
     if (!isMatch) {
-      return res.status(400).json({ msg: "Invalid password. " });
+      return res.status(400).json({ msg: "Invalid password." });
     }
-    const token = jwt.sign({ id: user._id }, process.env.JWT_SECRET);
+
+    const expiresIn = rememberMe ? '7d' : '1h';
+    const token = jwt.sign({ id: user._id }, process.env.JWT_SECRET, { expiresIn });
     delete user.password;
     res.status(200).json({ token, user });
   } catch (err) {
     res.status(500).json({ error: err.message });
   }
 };
+
+/* LOGOUT */
+export const logout = async (req, res) => {
+  try {
+    res.status(200).json({ message: "Logged out successfully" });
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+};
+
+
 
 /* VERIFY EMAIL */
 export const verifyEmail = async (req, res) => {
