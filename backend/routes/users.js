@@ -13,6 +13,7 @@ import {
   getUserRank
 } from "../controllers/users.js";
 import { verifyToken } from "../middleware/auth.js";
+import User from "../models/User.js"
 
 const router = express.Router();
 
@@ -27,12 +28,10 @@ router.get("/:id/topLiker", verifyToken, getTopLiker);
 /* UPDATE */
 router.patch("/:id/:userId", verifyToken, addRemoveFollow);
 
+/* UPDATE USER PASSWORD */
+router.post("/:id/password", verifyToken, updatePassword);
 /* UPDATE USER DETAILS */
 router.patch("/:id", verifyToken, updateUser);
-
-/* UPDATE USER PASSWORD */
-router.patch("/:id/password", verifyToken, updatePassword);
-
 /* UPDATE USER PICTURE */
 router.patch("/:id/picture", verifyToken, updateUserPicture);
 

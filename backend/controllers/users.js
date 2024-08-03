@@ -60,6 +60,7 @@ export const addRemoveFollow = async (req, res) => {
     const { id, userId } = req.params;  // 'id' is the logged-in user, 'userId' is the user to follow/unfollow
     const user = await User.findById(id);
     const follower = await User.findById(userId);
+    console.log(id);
 
     if (!user || !follower) {
       return res.status(404).json({ message: "User(s) not found" });
@@ -144,9 +145,11 @@ export const updatePassword = async (req, res) => {
 
     res.status(200).json(updatedUser);
   } catch (error) {
-    res.status(500).json({ error: error.message });
+    console.error('Error updating password:', error); // Log error for debugging
+    res.status(500).json({ error: 'An error occurred while updating the password' });
   }
 };
+
 
 /* UPDATE USER PICTURE */
 export const updateUserPicture = async (req, res) => {
