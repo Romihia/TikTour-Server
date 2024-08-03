@@ -9,7 +9,8 @@ import {
   updateUserPicture,
   deleteUser,
   getTotalLikes,
-  getTopLiker
+  getTopLiker,
+  getUserRank
 } from "../controllers/users.js";
 import { verifyToken } from "../middleware/auth.js";
 
@@ -36,9 +37,11 @@ router.patch("/:id/password", verifyToken, updatePassword);
 router.patch("/:id/picture", verifyToken, updateUserPicture);
 
 /* DELETE USER */
-router.delete("/:id", verifyToken, deleteUser); // Added delete user route
+router.delete("/:id", verifyToken, deleteUser); 
 
 
+// routes/users.js
+router.get("/:id/rank", verifyToken, getUserRank);
 
 
 export default router;
