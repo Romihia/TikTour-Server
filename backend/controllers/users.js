@@ -60,6 +60,7 @@ export const addRemoveFollow = async (req, res) => {
     const { id, userId } = req.params;  // 'id' is the logged-in user, 'userId' is the user to follow/unfollow
     const user = await User.findById(id);
     const follower = await User.findById(userId);
+    console.log(id);
 
     if (!user || !follower) {
       return res.status(404).json({ message: "User(s) not found" });
@@ -116,22 +117,39 @@ export const updateUser = async (req, res) => {
 /* UPDATE USER PASSWORD */
 export const updatePassword = async (req, res) => {
   const { id } = req.params;
-  const { newPassword } = req.body;
+  const { oldPassword, newPassword } = req.body;
 
   try {
+    // Find the user by ID
+    const user = await User.findById(id);
+    if (!user) {
+      return res.status(404).json({ error: 'User not found' });
+    }
+
+    // Check if the oldPassword matches the user's current password
+    const isMatch = await bcrypt.compare(oldPassword, user.password);
+    if (!isMatch) {
+      return res.status(400).json({ error: 'Old password is incorrect' });
+    }
+
+    // Hash the new password
     const salt = await bcrypt.genSalt();
     const passwordHash = await bcrypt.hash(newPassword, salt);
 
+    // Update the user's password
     const updatedUser = await User.findByIdAndUpdate(
       id,
       { password: passwordHash },
       { new: true }
     );
+
     res.status(200).json(updatedUser);
   } catch (error) {
-    res.status(500).json({ error: error.message });
+    console.error('Error updating password:', error); // Log error for debugging
+    res.status(500).json({ error: 'An error occurred while updating the password' });
   }
 };
+
 
 /* UPDATE USER PICTURE */
 export const updateUserPicture = async (req, res) => {
