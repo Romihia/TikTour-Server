@@ -36,7 +36,7 @@ router.patch("/:id/password", verifyToken, updatePassword);
 router.patch("/:id/picture", verifyToken, updateUserPicture);
 
 /* DELETE USER */
-router.delete("/:id", verifyToken, deleteUser); // Added delete user route
+router.delete("/:id", verifyToken, deleteUser);
 
 
 
