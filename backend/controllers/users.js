@@ -100,12 +100,22 @@ export const addRemoveFollow = async (req, res) => {
 /* UPDATE USER DETAILS */
 export const updateUser = async (req, res) => {
   const { id } = req.params;
-  const { firstName, lastName, email, location, rank } = req.body;
+  const { firstName, lastName, email, location, picturePath } = req.body;
+  console.log("id:",id,"firstName:", firstName, "lastName:", lastName, "email:", email, "location:", location, "picturePath:", picturePath);
 
   try {
+    if (User.picturePath != picturePath){
+      console.log("try to update post user picture path");
+      await Post.updateMany(
+        {userId: id} ,
+        { userPicturePath: picturePath },
+        { new: true }
+      );
+    }
+
     const updatedUser = await User.findByIdAndUpdate(
-      id,
-      { firstName, lastName, email, location, rank },
+      id ,
+      { firstName, lastName, email, location, picturePath },
       { new: true }
     );
     res.status(200).json(updatedUser);
@@ -118,10 +128,10 @@ export const updateUser = async (req, res) => {
 export const updateUserPrompt = async (req, res) => {
   const { username } = req.params;
   const { firstName, lastName, dateOfBirth, location, picturePath } = req.body;
-  console.log("firstName:", firstName, "lastName:", lastName, "dateOfBirth:", dateOfBirth, "location:", location, "profilePicture:", picturePath);
+  console.log("firstName:", firstName, "lastName:", lastName, "dateOfBirth:", dateOfBirth, "location:", location, "picturePath:", picturePath);
 
   try {
-    //con picturePuth = picturePath.path
+    
     const updatedUser = await User.findOneAndUpdate(
       { username },
       { firstName, lastName, dateOfBirth, location, picturePath },
@@ -276,3 +286,5 @@ export const getUserRank = async (req, res) => {
     res.status(500).json({ message: err.message });
   }
 };
+
+

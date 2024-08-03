@@ -28,14 +28,13 @@ router.get("/:id/topLiker", verifyToken, getTopLiker);
 /* UPDATE USER DETAILS IN PROMPT */
 router.post("/prompt/:username", verifyToken, updateUserPrompt);
 
-
 /* UPDATE */
 router.patch("/:id/:userId", verifyToken, addRemoveFollow);
 
 /* UPDATE USER PASSWORD */
 router.post("/:id/password", verifyToken, updatePassword);
 /* UPDATE USER DETAILS */
-router.patch("/:id", verifyToken, updateUser);
+router.post("/:id", verifyToken, updateUser);
 /* UPDATE USER PICTURE */
 router.patch("/:id/picture", verifyToken, updateUserPicture);
 
