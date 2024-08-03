@@ -35,8 +35,6 @@ export const register = async (req, res) => {
       username,
       dateOfBirth,
       isVerified: false,
-      viewedProfile: Math.floor(Math.random() * 10000),
-      impressions: Math.floor(Math.random() * 10000),
     });
     
     // Check unique fileds

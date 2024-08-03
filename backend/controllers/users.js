@@ -232,3 +232,24 @@ export const getTopLiker = async (req, res) => {
     res.status(500).json({ message: err.message });
   }
 };
+
+export const getUserRank = async (req, res) => {
+  try {
+    const { id } = req.params;
+
+    const posts = await Post.find({ userId: id });
+
+    // Determine the user's ranking based on the number of posts
+    let rank = "Novice Explorer"; // Default rank
+    const postCount = posts.length;
+    if (postCount >= 50) rank = "Master Traveler";
+    else if (postCount >= 40) rank = "Voyager";
+    else if (postCount >= 30) rank = "Globetrotter";
+    else if (postCount >= 20) rank = "Adventurer";
+    else if (postCount >= 10) rank = "Wanderer";
+
+    res.status(200).json({ rank });
+  } catch (err) {
+    res.status(500).json({ message: err.message });
+  }
+};

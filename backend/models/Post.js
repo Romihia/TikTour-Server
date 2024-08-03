@@ -6,6 +6,10 @@ const postSchema = mongoose.Schema(
       type: String,
       required: true,
     },
+    sharedById: {
+      type: String,
+      defaultValue: "",
+    },
     firstName: {
       type: String,
       required: true,
