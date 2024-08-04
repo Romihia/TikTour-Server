@@ -16,6 +16,25 @@ export const getUser = async (req, res) => {
   }
 };
 
+export const getUserByUsername = async (req, res) => {
+  try {
+    console.log("req.params: " + JSON.stringify(req.params));
+    const { username } = req.params;
+    
+    // Use findOne to find a user by username
+    const user = await User.findOne({ username: username });
+    
+    if (!user) {
+      return res.status(404).json({ message: "User not found" });
+    }
+    
+    res.status(200).json(user);
+  } catch (err) {
+    res.status(500).json({ message: err.message });
+  }
+};
+
+
 export const getUserFollowers = async (req, res) => {
   try {
     const { id } = req.params;
