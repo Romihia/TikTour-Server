@@ -11,7 +11,8 @@ import {
   getTotalLikes,
   getTopLiker,
   getUserRank,
-  updateUserPrompt
+  updateUserPrompt,
+  getUserByUsername,
 } from "../controllers/users.js";
 import { verifyToken } from "../middleware/auth.js";
 import User from "../models/User.js"
@@ -20,6 +21,7 @@ const router = express.Router();
 
 /* READ */
 router.get("/:id", verifyToken, getUser);
+router.get("/:username/getByUsername", verifyToken, getUserByUsername);
 router.get("/:id/followers", verifyToken, getUserFollowers);
 router.get("/:id/following", verifyToken, getUserFollowing);
 router.get("/:id/totalLikes", verifyToken, getTotalLikes);
