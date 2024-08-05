@@ -25,7 +25,8 @@ export const getUserByUsername = async (req, res) => {
     const user = await User.findOne({ username: username });
     
     if (!user) {
-      return res.status(404).json({ message: "User not found" });
+      console.log("User not found");
+      return res.status(404).json({ _id: "UsernameNotFound", message: "User not found" });
     }
     
     res.status(200).json(user);
