@@ -74,9 +74,14 @@ const UserSchema = new mongoose.Schema(
       required: false,
       default: false,
     },
+    previousSearchingFilters: {
+      type: Array,
+      default: [],
+    }
   },
   { timestamps: true }
 );
 
 const User = mongoose.model("User", UserSchema);
+
 export default User;
