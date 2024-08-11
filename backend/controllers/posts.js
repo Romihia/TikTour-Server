@@ -111,8 +111,9 @@ export const getFeedPosts = async (req, res) => {
 export const getUserPosts = async (req, res) => {
   try {
     const { userId } = req.params;
-    const post = await Post.find({ userId });
-    res.status(200).json(post);
+    const allPosts = await Post.find().lean();
+    const userPosts = allPosts.filter((post) => post.userId === userId || post.sharedById === userId);
+    res.status(200).json(userPosts);
   } catch (err) {
     res.status(404).json({ message: err.message });
   }
