@@ -1,6 +1,7 @@
 import User from "../models/User.js";
 import Post from "../models/Post.js";
 import bcrypt from "bcrypt";
+import { dislikePost } from "./posts.js";
 
 /* READ */
 export const getUser = async (req, res) => {
@@ -320,3 +321,4 @@ export const getUserRank = async (req, res) => {
     res.status(500).json({ message: err.message });
   }
 };
+

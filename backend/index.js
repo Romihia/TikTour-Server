@@ -14,6 +14,7 @@ import userRoutes from './routes/users.js';
 import postRoutes from './routes/posts.js';
 import searchRoutes from './routes/search.js';
 import notificationsRoutes from './routes/notifications.js';
+import saveRoutes from './routes/save.js';
 import { register } from './controllers/auth.js';
 import { createPost } from './controllers/posts.js';
 import { verifyToken } from './middleware/auth.js';
@@ -87,6 +88,7 @@ app.use('/users', userRoutes);
 app.use('/posts', postRoutes);
 app.use('/search', searchRoutes);
 app.use('/notifications', notificationsRoutes);
+app.use('/save', saveRoutes);
 
 /* MONGOOSE SETUP */
 mongoose.set('strictQuery', false); // Set here before connecting

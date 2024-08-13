@@ -81,6 +81,10 @@ const UserSchema = new mongoose.Schema(
     notifications: {
       type: Array,
       default: [],
+    },
+    savedPosts: {
+      type: Array,
+      default: [],
     }
   },
   { timestamps: true }
