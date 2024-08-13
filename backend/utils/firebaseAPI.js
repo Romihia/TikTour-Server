@@ -1,17 +1,42 @@
-import { ref, uploadBytes, deleteObject } from "firebase/storage";
+import { ref, uploadBytes, getDownloadURL } from "firebase/storage"; // Ensure getDownloadURL is imported
 import { storage } from "./firebaseConfig.js";
 
 export const uploadImage = async (filename, fileBuffer) => {
   try {
+    // Determine the content type based on the file extension or other criteria
+    let contentType;
+    if (filename.endsWith('.jpeg') || filename.endsWith('.jpg')) {
+      contentType = 'image/jpeg';
+    } else if (filename.endsWith('.png')) {
+      contentType = 'image/png';
+    } else {
+      throw new Error('Unsupported file type');
+    }
+
+    // Create a reference to the file in Firebase Storage
     const storageRef = ref(storage, `images/${filename}`);
-    const snapshot = await uploadBytes(storageRef, fileBuffer);
+    
+    // Set the metadata, including the content type
+    const metadata = {
+      contentType: contentType,
+    };
+
+    // Upload the file to Firebase Storage with the specified metadata
+    const snapshot = await uploadBytes(storageRef, fileBuffer, metadata);
     console.log('Upload successful:', snapshot.metadata);
-    return snapshot;
+    
+    // Get the download URL for the uploaded file
+    const downloadURL = await getDownloadURL(storageRef);
+    console.log('Download URL:', downloadURL);
+    
+    // Return the download URL
+    return downloadURL;
   } catch (error) {
     console.error("Full error details:", error);
     throw new Error("Failed to upload image");
   }
 };
+
 
 export const deleteImage = async (filename) => {
   if (filename!='user.png'){

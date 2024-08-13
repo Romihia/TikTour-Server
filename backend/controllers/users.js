@@ -205,19 +205,44 @@ export const updatePassword = async (req, res) => {
 /* UPDATE USER PICTURE */
 export const updateUserPicture = async (req, res) => {
   const { id } = req.params;
-  const { picturePath } = req.body;
+  const file = req.file;
+
+  const newPictureName = file.originalname.split('.')[0] + id + '.' + file.originalname.split('.')[1];
 
   try {
-    const updatedUser = await User.findByIdAndUpdate(
-      id,
-      { picturePath },
-      { new: true }
-    );
-    res.status(200).json(updatedUser);
+    // Upload the new image
+    const responseUpload = await uploadImage(newPictureName, file.buffer);
+    if (responseUpload.ok) {
+      // Fetch the existing user's picture path
+      const user = await User.findById(id);
+      const oldPicturePath = user.picturePath;
+
+      // Delete the old image if it exists
+      if (oldPicturePath) {
+        const responseDelete = await deleteImage(oldPicturePath);
+        if (!responseDelete.ok) {
+          throw new Error('Failed to delete old image');
+        }
+      }
+
+      // Update the user's picture path in the database
+      const updatedUser = await User.findByIdAndUpdate(
+        id,
+        { picturePath: newPictureName },
+        { new: true }
+      );
+
+      res.status(200).json(updatedUser);
+    } else {
+      throw new Error('Failed to upload new image');
+    }
   } catch (error) {
+    // If there's an error, reset the user's picture path or respond with an error message
+    await User.findByIdAndUpdate(id, { picturePath: 'user.png' }, { new: true });
     res.status(500).json({ error: error.message });
   }
 };
+
 
 /* DELETE USER */
 export const deleteUser = async (req, res) => {
