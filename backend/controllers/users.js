@@ -1,6 +1,7 @@
 import User from "../models/User.js";
 import Post from "../models/Post.js";
 import bcrypt from "bcrypt";
+import { dislikePost } from "./posts.js";
 
 /* READ */
 export const getUser = async (req, res) => {
@@ -35,7 +36,6 @@ export const getUserByUsername = async (req, res) => {
     res.status(500).json({ message: err.message });
   }
 };
-
 
 export const getUserFollowers = async (req, res) => {
   try {
@@ -96,6 +96,21 @@ export const addRemoveFollow = async (req, res) => {
     } else {
       user.following.push(userId);
       follower.followers.push(id);
+
+      const newNotification = {
+        notificationType: "newFollower",
+        text: user.username + " followed you.",
+        followerId: user.id,
+      };
+
+      follower.notifications = follower.notifications.filter((notification) => {
+        return JSON.stringify(notification) !== JSON.stringify(newNotification);
+      });
+
+      follower.notifications.push(newNotification);
+
+      // Save the updated user document
+      await follower.save();
     }
 
     await user.save();
@@ -105,6 +120,7 @@ export const addRemoveFollow = async (req, res) => {
     const updatedFollowing = await Promise.all(
       user.following.map((id) => User.findById(id))
     );
+
     const formattedFollowing = updatedFollowing.map(
       ({ _id, firstName, lastName, location, picturePath }) => {
         return { _id, firstName, lastName, location, picturePath };
@@ -116,7 +132,6 @@ export const addRemoveFollow = async (req, res) => {
     res.status(404).json({ message: err.message });
   }
 };
-
 
 /* UPDATE USER DETAILS */
 export const updateUser = async (req, res) => {
@@ -163,7 +178,6 @@ export const updateUserPrompt = async (req, res) => {
     res.status(500).json({ error: error.message });
   }
 };
-
 
 /* UPDATE USER PASSWORD */
 export const updatePassword = async (req, res) => {
@@ -332,5 +346,4 @@ export const getUserRank = async (req, res) => {
     res.status(500).json({ message: err.message });
   }
 };
-
 

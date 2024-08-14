@@ -40,6 +40,7 @@ router.patch("/:id/:userId", verifyToken, addRemoveFollow);
 router.post("/:id/password", verifyToken, updatePassword);
 /* UPDATE USER DETAILS */
 router.post("/:id", verifyToken, updateUser);
+
 /* UPDATE USER PICTURE */
 router.post("/:id/picture", verifyToken, upload.single('picture') , updateUserPicture);
 

@@ -77,6 +77,14 @@ const UserSchema = new mongoose.Schema(
     previousSearchingFilters: {
       type: Array,
       default: [],
+    },
+    notifications: {
+      type: Array,
+      default: [],
+    },
+    savedPosts: {
+      type: Array,
+      default: [],
     }
   },
   { timestamps: true }

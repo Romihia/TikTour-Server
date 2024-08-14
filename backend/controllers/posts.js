@@ -66,8 +66,8 @@ export const createPost = async (req, res) => {
   try {
     const { userId, sharedById, description, location, hashtags } = req.body;
     const user = await User.findById(userId);
-    
-    console.log("req.body: ", req.body);
+    console.log("\n\n\nUser: "+JSON.stringify(user));
+    console.log("\n\n\nreq.body: ", req.body);
 
     // Handle image file if present
     const picturePath = req.file ? req.file.filename : '';
@@ -88,6 +88,32 @@ export const createPost = async (req, res) => {
     });
 
     await newPost.save();
+
+    // Notify the author of the shared post.
+    const sharingUser = await User.findById(sharedById);
+
+    const originalPost = await Post.findOne({
+      userId: userId,
+      sharedById: sharedById,
+      description: description,
+      location: location,
+      hashtags: hashtags
+    });
+
+    const newNotification = {
+      notificationType: "share",
+      text: sharingUser.username + " shared your post.",
+      originalPostId: originalPost._id,
+      userId: sharedById,
+    }
+
+    user.notifications = user.notifications.filter((notification) => {
+      return JSON.stringify(notification) !== JSON.stringify(newNotification);
+    });
+
+    user.notifications.push(newNotification);
+
+    await user.save();
 
     const post = await Post.find();
     res.status(201).json(post);
@@ -126,11 +152,30 @@ export const likePost = async (req, res) => {
     const { userId } = req.body;
     const post = await Post.findById(id);
     const isLiked = post.likes.get(userId);
-
     if (isLiked) {
       post.likes.delete(userId);
     } else {
       post.likes.set(userId, true);
+      const currentUser = await User.findById(userId);
+      const userToNotify = await User.findOne({"username": post.userName});
+
+      const newNotification = {
+        notificationType: "like",
+        text: currentUser.username + " liked your post.",
+        postId: post.id
+      };
+
+      userToNotify.notifications = userToNotify.notifications.filter((notification) => {
+        if (
+          notification.text === newNotification.text &&
+          notification.postId === newNotification.postId
+          )
+          return false;
+        return true;
+      });
+
+      userToNotify.notifications.push(newNotification);
+      await userToNotify.save();
     }
 
     const updatedPost = await Post.findByIdAndUpdate(
@@ -138,6 +183,7 @@ export const likePost = async (req, res) => {
       { likes: post.likes },
       { new: true }
     );
+    console.log("\n\n\n22222\n\n\n");
 
     res.status(200).json(updatedPost);
   } catch (err) {
@@ -156,6 +202,25 @@ export const dislikePost = async (req, res) => {
       post.dislikes.delete(userId);
     } else {
       post.dislikes.set(userId, true);
+      const currentUser = await User.findById(userId);
+      const userToNotify = await User.findOne({"username": post.userName});
+
+      const newNotification = {
+        notificationType: "dislike",
+        text: currentUser.username + " disliked your post.",
+        postId: post.id
+      };
+
+      userToNotify.notifications = userToNotify.notifications.filter((notification) => {
+        if (
+          notification.text === newNotification.text &&
+          notification.postId === newNotification.postId
+          )
+          return false;
+        return true;
+      });
+      userToNotify.notifications.push(newNotification);
+      await userToNotify.save();
     }
 
     const updatedPost = await Post.findByIdAndUpdate(
