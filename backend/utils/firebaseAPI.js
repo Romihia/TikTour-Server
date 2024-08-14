@@ -2,6 +2,7 @@ import { ref, uploadBytes, getDownloadURL } from "firebase/storage"; // Ensure g
 import { storage } from "./firebaseConfig.js";
 
 export const uploadImage = async (filename, fileBuffer) => {
+  let downloadURL=null;
   try {
     // Determine the content type based on the file extension or other criteria
     let contentType;
@@ -26,7 +27,7 @@ export const uploadImage = async (filename, fileBuffer) => {
     console.log('Upload successful:', snapshot.metadata);
     
     // Get the download URL for the uploaded file
-    const downloadURL = await getDownloadURL(storageRef);
+    downloadURL = await getDownloadURL(storageRef);
     console.log('Download URL:', downloadURL);
     
     // Return the download URL
@@ -39,7 +40,7 @@ export const uploadImage = async (filename, fileBuffer) => {
 
 
 export const deleteImage = async (filename) => {
-  if (filename!='user.png'){
+  if (filename!='https://firebasestorage.googleapis.com/v0/b/tiktour-79fa8.appspot.com/o/images%2Fuser.png?alt=media&token=f959d22e-4d99-495a-8be8-82d2483b30e5'){
     try {
       // Construct the full path to the file within Firebase Storage
       const storageRef = ref(storage, `images/${filename}`);
@@ -55,4 +56,5 @@ export const deleteImage = async (filename) => {
       throw new Error("Failed to delete image");
     }
   }
+  return true;
 };

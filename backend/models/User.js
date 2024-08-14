@@ -41,7 +41,7 @@ const UserSchema = new mongoose.Schema(
     },
     picturePath: {
       type: String,
-      default: "user.png",
+      default: "https://firebasestorage.googleapis.com/v0/b/tiktour-79fa8.appspot.com/o/images%2Fuser.png?alt=media&token=f959d22e-4d99-495a-8be8-82d2483b30e5",
       required: false,
     },
     followers: {
