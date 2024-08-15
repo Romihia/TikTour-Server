@@ -1,28 +1,30 @@
 import Post from "../models/Post.js";
 import User from "../models/User.js";
-import path from 'path';
-import fs from 'fs';
 import { generateUniqueFileName, uploadImage } from "../utils/firebaseAPI.js";
 
 /* CREATE */
 export const createPost = async (req, res) => {
   const newPictureNames = [];
   try {
-    const { userId, sharedById, description, location, hashtags } = req.body;
+    const { userId, sharedById, description, location, hashtags ,picturePath} = req.body;
     const user = await User.findById(userId);
 
     // Handle multiple image uploads
-    const picturePaths = [];
+    const uplaodPicturePaths = [];
     if (req.files) {
       for (const file of req.files) {
         // Generate a unique filename using the utility function
         const newPictureName = generateUniqueFileName(file, Date.now());
         newPictureNames.push(newPictureName);
         const imageUrl = await uploadImage(newPictureName, file.buffer); // Upload to Firebase
-        picturePaths.push(imageUrl); // Collect image URLs
+        uplaodPicturePaths.push(imageUrl); // Collect image URLs
       }
     }
-
+    if(picturePath){
+      for (const picture of picturePath) {// when using sherd opshion
+        uplaodPicturePaths.push(picture); 
+      }
+    }
     const newPost = new Post({
       userId,
       sharedById,
@@ -32,7 +34,7 @@ export const createPost = async (req, res) => {
       location,
       description,
       userPicturePath: user.picturePath,
-      picturePath: picturePaths, // Store multiple image URLs
+      picturePath: uplaodPicturePaths, // Store multiple image URLs
       likes: {},
       dislikes: {},
       hashtags,
