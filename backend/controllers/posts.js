@@ -2,86 +2,37 @@ import Post from "../models/Post.js";
 import User from "../models/User.js";
 import path from 'path';
 import fs from 'fs';
-
-// Update a post
-export const updatePost = async (req, res) => {
-  console.log("req.body: ", req.body);
-  console.log("res.body: ", res.body);
-  try {
-    const id = req.body.id;
-    const { userId, description, location, hashtags } = req.body;
-
-    console.log("\n\n\n\n\n\n\nid: " + id);
-
-    // Find the post to update
-    const post = await Post.findById(id);
-    
-    if (!post) {
-      return res.status(404).json({ message: "Post not found" });
-    }
-
-    // Check if the authenticated user is the owner of the post
-    if (post.userId !== userId) {
-      return res.status(403).json({ message: "Unauthorized" });
-    }
-
-    // Handle image update
-    let picturePath;
-    if (req.body) {
-      // If a new image is uploaded, update the picturePath
-      picturePath = req.body.picturePath;
-      
-      // Optionally, delete the old image from the server
-      const oldPicturePath = post.picturePath;
-      if (oldPicturePath) {
-        fs.unlinkSync(path.join('public/assets', oldPicturePath));
-      }
-    } else {
-      // Retain the existing picturePath if no new image is uploaded
-      picturePath = post.picturePath;
-    }
-
-    // Update the post with new data
-    const updatedPost = await Post.findByIdAndUpdate(
-      id,
-      {
-        description: description || post.description,
-        location: location || post.location,
-        hashtags: hashtags || post.hashtags,
-        picturePath: picturePath || post.picturePath,
-      },
-      { new: true }
-    );
-    console.log("Updated post: "+updatedPost);
-
-    
-    res.status(200).json(updatedPost);
-  } catch (err) {
-    res.status(500).json({ message: err.message });
-  }
-};
+import { generateUniqueFileName, uploadImage } from "../utils/firebaseAPI.js";
 
 /* CREATE */
 export const createPost = async (req, res) => {
+  const newPictureNames = [];
   try {
     const { userId, sharedById, description, location, hashtags } = req.body;
     const user = await User.findById(userId);
-    console.log("\n\n\nUser: "+JSON.stringify(user));
-    console.log("\n\n\nreq.body: ", req.body);
 
-    // Handle image file if present
-    const picturePath = req.file ? req.file.filename : '';
+    // Handle multiple image uploads
+    const picturePaths = [];
+    if (req.files) {
+      for (const file of req.files) {
+        // Generate a unique filename using the utility function
+        const newPictureName = generateUniqueFileName(file, Date.now());
+        newPictureNames.push(newPictureName);
+        const imageUrl = await uploadImage(newPictureName, file.buffer); // Upload to Firebase
+        picturePaths.push(imageUrl); // Collect image URLs
+      }
+    }
 
     const newPost = new Post({
       userId,
-      sharedById: sharedById,
+      sharedById,
       firstName: user.firstName,
       lastName: user.lastName,
       userName: user.username,
       location,
       description,
       userPicturePath: user.picturePath,
-      picturePath,
+      picturePath: picturePaths, // Store multiple image URLs
       likes: {},
       dislikes: {},
       hashtags,
@@ -118,11 +69,98 @@ export const createPost = async (req, res) => {
     const post = await Post.find();
     res.status(201).json(post);
   } catch (err) {
+    // Delete the uploaded images if creation fails
+    if (newPictureNames.length > 0){
+      try {
+        // Delete the images from Firebase
+        for (const PictureNameToDelete of newPictureNames) {
+          await deleteImage(PictureNameToDelete);
+        }
+      } catch (err) {
+        console.log("Error on deleting images after failed post creation.");
+      }
+    }
     res.status(409).json({ message: err.message });
     console.log("Error on creating post.");
   }
 };
 
+// Update a post
+export const updatePost = async (req, res) => {
+  const newPictureNames = [];
+  try {
+    const id = req.params.id;
+    const { userId, description, location, hashtags } = req.body;
+    let { imagesToRemove } = req.body;
+     // New param to track images to remove
+    console.log("*************************************************************");
+    console.log(imagesToRemove);
+    if (Array.isArray(imagesToRemove)) {
+      console.log("imagesToRemove is an array");
+    } else {
+      imagesToRemove=[imagesToRemove];
+      console.log("imagesToRemove is not an array");
+    }
+    const post = await Post.findById(id);
+    if (!post) {
+      return res.status(404).json({ message: "Post not found" });
+    }
+
+    if (post.userId !== userId) {
+      return res.status(403).json({ message: "Unauthorized" });
+    }
+
+    // Handle image removal (if imagesToRemove is passed)
+  
+    let picturePaths = post.picturePath; // Existing pictures
+    
+    for (const imageUrl of imagesToRemove) {
+      console.log("imageUrl:",imageUrl);
+      // Remove from Firebase
+      //await deleteImage(imageUrl.split('/').pop()); // Deletes from Firebase
+      // Remove from the array
+      picturePaths = picturePaths.filter((url) => url !== imageUrl);
+    }
+    
+
+    // Handle image upload (if new images are uploaded)
+    if (req.files && req.files.length > 0) {
+      for (const file of req.files) {
+        const newPictureName = generateUniqueFileName(file, Date.now());
+        newPictureNames.push(newPictureName);
+        const imageUrl = await uploadImage(newPictureName, file.buffer); // Upload to Firebase
+        picturePaths.push(imageUrl); // Add new image URLs to existing list
+      }
+    }
+
+    // Update the post with new data
+    const updatedPost = await Post.findByIdAndUpdate(
+      id,
+      {
+        description: description || post.description,
+        location: location || post.location,
+        hashtags: hashtags || post.hashtags,
+        picturePath: picturePaths, // Update with new and existing image URLs
+      },
+      { new: true }
+    );
+
+    res.status(200).json(updatedPost);
+  } catch (err) {
+    // Delete the uploaded images if creation fails
+    if (newPictureNames.length > 0){
+      try {
+        // Delete the images from Firebase
+        for (const PictureNameToDelete of newPictureNames) {
+          await deleteImage(PictureNameToDelete);
+        }
+      } catch (err) {
+        console.log("Error on deleting images after failed post creation.");
+      }
+    }
+    res.status(500).json({ message: err.message });
+  }
+};
 
 /* READ */
 export const getFeedPosts = async (req, res) => {
@@ -235,13 +273,20 @@ export const dislikePost = async (req, res) => {
   }
 };
 
-/* DELETE */
+// DELETE A POST
 export const deletePost = async (req, res) => {
   try {
     const { id } = req.params;
     const post = await Post.findByIdAndDelete(id);
-    const posts = await Post.find();
-    res.status(200).json({ message: 'Post deleted successfully', posts });
+
+    // Delete associated images from Firebase
+    // if (post.picturePath && post.picturePath.length > 0) {
+    //   for (const imageUrl of post.picturePath) {
+    //     await deleteImage(imageUrl.split('/').pop()); // Delete from Firebase
+    //   }
+    // }
+
+    res.status(200).json({ message: 'Post and associated images deleted successfully',post });
   } catch (err) {
     res.status(500).json({ message: err.message });
   }

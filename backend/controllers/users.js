@@ -210,8 +210,17 @@ export const updatePassword = async (req, res) => {
 export const updateUserPicture = async (req, res) => {
   const { id } = req.params;
   const file = req.file;
-  const newPictureName = file.originalname.split('.')[0] + id + '.' + file.originalname.split('.')[1];
+  const originalName = file.originalname;
 
+  // Find the last index of a dot to separate the base name and the extension
+  const lastDotIndex = originalName.lastIndexOf('.');
+  
+  // Get the base name (everything before the last dot) and the extension (everything after the last dot)
+  const baseName = originalName.substring(0, lastDotIndex);
+  const fileExtension = originalName.substring(lastDotIndex + 1);
+  
+  // Now create the new picture name by appending the ID before the file extension
+  const newPictureName = `${baseName}-${id}.${fileExtension}`;
   try {
     // Upload the new image to Firebase
     const responseUpload = await uploadImage(newPictureName, file.buffer);

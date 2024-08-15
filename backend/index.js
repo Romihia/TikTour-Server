@@ -35,14 +35,7 @@ app.use(cors());
 app.use('/assets', express.static(path.join(__dirname, 'public/assets')));
 
 /* FILE STORAGE */
-const storage = multer.diskStorage({
-  destination: function (req, file, cb) {
-    cb(null, 'public/assets');
-  },
-  filename: function (req, file, cb) {
-    cb(null, file.originalname);
-  },
-});
+const storage = multer.memoryStorage(); // Storing in memory to upload directly to Firebase
 const upload = multer({ storage });
 
 app.get('/ping', (req, res) => {
@@ -82,7 +75,6 @@ app.get('/terms', (req, res) => {
 });
 
 app.post('/auth/register', register);
-app.post('/posts', verifyToken, upload.single('picture'), createPost);
 
 /* ROUTES */
 app.use('/auth', authRoutes);
