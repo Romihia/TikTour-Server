@@ -1,4 +1,5 @@
 import express from "express";
+import multer from 'multer';
 import {
   getUser,
   getUserFollowers,
@@ -17,7 +18,8 @@ import {
 import { verifyToken } from "../middleware/auth.js";
 
 const router = express.Router();
-
+const storage = multer.memoryStorage();
+const upload = multer({ storage: storage });
 /* READ */
 router.get("/:id", verifyToken, getUser);
 router.get("/:username/getByUsername", verifyToken, getUserByUsername);
@@ -40,7 +42,7 @@ router.post("/:id/password", verifyToken, updatePassword);
 router.post("/:id", verifyToken, updateUser);
 
 /* UPDATE USER PICTURE */
-router.patch("/:id/picture", verifyToken, updateUserPicture);
+router.post("/:id/picture", verifyToken, upload.single('picture') , updateUserPicture);
 
 /* DELETE USER */
 router.delete("/:id", verifyToken, deleteUser); 

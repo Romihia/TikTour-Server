@@ -2,6 +2,7 @@ import User from "../models/User.js";
 import Post from "../models/Post.js";
 import bcrypt from "bcrypt";
 import { dislikePost } from "./posts.js";
+import { uploadImage, deleteImage } from '../utils/firebaseAPI.js';
 
 /* READ */
 export const getUser = async (req, res) => {
@@ -136,22 +137,13 @@ export const addRemoveFollow = async (req, res) => {
 /* UPDATE USER DETAILS */
 export const updateUser = async (req, res) => {
   const { id } = req.params;
-  const { firstName, lastName, email, location, picturePath } = req.body;
-  console.log("id:",id,"firstName:", firstName, "lastName:", lastName, "email:", email, "location:", location, "picturePath:", picturePath);
+  const { firstName, lastName, email, location } = req.body;
+  console.log("id:",id,"firstName:", firstName, "lastName:", lastName, "email:", email, "location:", location);
 
   try {
-    if (User.picturePath != picturePath){
-      console.log("try to update post user picture path");
-      await Post.updateMany(
-        {userId: id} ,
-        { userPicturePath: picturePath },
-        { new: true }
-      );
-    }
-
     const updatedUser = await User.findByIdAndUpdate(
       id ,
-      { firstName, lastName, email, location, picturePath },
+      { firstName, lastName, email, location},
       { new: true }
     );
     res.status(200).json(updatedUser);
@@ -163,14 +155,14 @@ export const updateUser = async (req, res) => {
 /* UPDATE USER Prompt */
 export const updateUserPrompt = async (req, res) => {
   const { username } = req.params;
-  const { firstName, lastName, dateOfBirth, location, picturePath } = req.body;
-  console.log("firstName:", firstName, "lastName:", lastName, "dateOfBirth:", dateOfBirth, "location:", location, "picturePath:", picturePath);
+  const { firstName, lastName, dateOfBirth, location } = req.body;
+  console.log("firstName:", firstName, "lastName:", lastName, "dateOfBirth:", dateOfBirth, "location:", location);
 
   try {
     
     const updatedUser = await User.findOneAndUpdate(
       { username },
-      { firstName, lastName, dateOfBirth, location, picturePath },
+      { firstName, lastName, dateOfBirth, location },
       { new: true }
     );
     res.status(200).json(updatedUser);
@@ -215,23 +207,79 @@ export const updatePassword = async (req, res) => {
   }
 };
 
-
-/* UPDATE USER PICTURE */
 export const updateUserPicture = async (req, res) => {
   const { id } = req.params;
-  const { picturePath } = req.body;
+  const file = req.file;
+  const originalName = file.originalname;
 
+  // Find the last index of a dot to separate the base name and the extension
+  const lastDotIndex = originalName.lastIndexOf('.');
+  
+  // Get the base name (everything before the last dot) and the extension (everything after the last dot)
+  const baseName = originalName.substring(0, lastDotIndex);
+  const fileExtension = originalName.substring(lastDotIndex + 1);
+  
+  // Now create the new picture name by appending the ID before the file extension
+  const newPictureName = `${baseName}-${id}.${fileExtension}`;
   try {
-    const updatedUser = await User.findByIdAndUpdate(
-      id,
-      { picturePath },
-      { new: true }
-    );
-    res.status(200).json(updatedUser);
+    // Upload the new image to Firebase
+    const responseUpload = await uploadImage(newPictureName, file.buffer);
+    console.log("New Image URL:", responseUpload);
+
+    if (responseUpload) {
+      // Fetch the existing user from the database
+      const user = await User.findById(id);
+      const oldPictureName = user.pictureName; // Get the old picture name
+
+      // Delete the old image if it exists and is not the default 'user.png'
+      if (oldPictureName && oldPictureName !== "user.png") {
+        try {
+          const responseDelete = await deleteImage(oldPictureName);
+          console.log(responseDelete.message); // Log the deletion status
+        } catch (error) {
+          console.error("Failed to delete old image:", error);
+          await deleteImage(newPictureName); // Rollback by deleting the newly uploaded image
+          throw new Error("Failed to delete old image.");
+        }
+      }
+
+      // Update the user's picture path and picture name in the database
+      const updatedUser = await User.findByIdAndUpdate(
+        id,
+        { 
+          picturePath: responseUpload, 
+          pictureName: newPictureName // Update the picture name
+        },
+        { new: true }
+      );
+
+      // Update all posts associated with this user to use the new userPicturePath
+      const updatedPostsPicture = await Post.updateMany(
+        { userId: id },
+        { userPicturePath: responseUpload } // Set the new user picture URL in all posts
+      );
+
+      console.log(`Updated ${updatedPostsPicture.modifiedCount} posts with new user picture path.`);
+
+      res.status(200).json(updatedUser); // Respond with the updated user
+    } else {
+      throw new Error("Failed to upload new image.");
+    }
   } catch (error) {
+    console.error("Error in updateUserPicture:", error);
+    // Reset the user's picture path if there was an error
+    await User.findByIdAndUpdate(id, { 
+      picturePath: 'https://firebasestorage.googleapis.com/v0/b/tiktour-79fa8.appspot.com/o/images%2Fuser.png?alt=media&token=f959d22e-4d99-495a-8be8-82d2483b30e5',
+      pictureName: "user.png"
+    }, { new: true });
     res.status(500).json({ error: error.message });
   }
 };
+
+
+
+
+
 
 /* DELETE USER */
 export const deleteUser = async (req, res) => {

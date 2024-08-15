@@ -18,6 +18,7 @@ import saveRoutes from './routes/save.js';
 import { register } from './controllers/auth.js';
 import { createPost } from './controllers/posts.js';
 import { verifyToken } from './middleware/auth.js';
+import pictureRoutes from './routes/picture.js';
 
 /* CONFIGURATIONS */
 const __filename = fileURLToPath(import.meta.url);
@@ -34,14 +35,7 @@ app.use(cors());
 app.use('/assets', express.static(path.join(__dirname, 'public/assets')));
 
 /* FILE STORAGE */
-const storage = multer.diskStorage({
-  destination: function (req, file, cb) {
-    cb(null, 'public/assets');
-  },
-  filename: function (req, file, cb) {
-    cb(null, file.originalname);
-  },
-});
+const storage = multer.memoryStorage(); // Storing in memory to upload directly to Firebase
 const upload = multer({ storage });
 
 app.get('/ping', (req, res) => {
@@ -51,6 +45,7 @@ app.get('/ping', (req, res) => {
 app.get('/', (req, res) => {
   res.send('Hello, World!');
 });
+
 /* ROUTES WITH FILES */
 app.get('/about', (req, res) => {
   const filePath = path.join(__dirname, 'about.html');
@@ -80,13 +75,13 @@ app.get('/terms', (req, res) => {
 });
 
 app.post('/auth/register', register);
-app.post('/posts', verifyToken, upload.single('picture'), createPost);
 
 /* ROUTES */
 app.use('/auth', authRoutes);
 app.use('/users', userRoutes);
 app.use('/posts', postRoutes);
 app.use('/search', searchRoutes);
+app.use('/picture', pictureRoutes);
 app.use('/notifications', notificationsRoutes);
 app.use('/save', saveRoutes);
 
