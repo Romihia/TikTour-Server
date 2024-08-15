@@ -207,52 +207,69 @@ export const updatePassword = async (req, res) => {
   }
 };
 
-
-/* UPDATE USER PICTURE */
 export const updateUserPicture = async (req, res) => {
   const { id } = req.params;
   const file = req.file;
-  //console.log(file);
   const newPictureName = file.originalname.split('.')[0] + id + '.' + file.originalname.split('.')[1];
-  //console.log(newPictureName);
-  try {
-    // Upload the new image
-    const responseUpload = await uploadImage(newPictureName, file.buffer);
-    console.log(responseUpload);
-    if (responseUpload) {
-      // Fetch the existing user's picture path
-      const user = await User.findById(id);
-      const oldPicturePath = user.picturePath;
 
-      // Delete the old image if it exists
-      if (oldPicturePath) {
-        const responseDelete = await deleteImage(oldPicturePath);
-        if (!responseDelete) {
-          throw new Error('Failed to delete old image');
+  try {
+    // Upload the new image to Firebase
+    const responseUpload = await uploadImage(newPictureName, file.buffer);
+    console.log("New Image URL:", responseUpload);
+
+    if (responseUpload) {
+      // Fetch the existing user from the database
+      const user = await User.findById(id);
+      const oldPictureName = user.pictureName; // Get the old picture name
+
+      // Delete the old image if it exists and is not the default 'user.png'
+      if (oldPictureName && oldPictureName !== "user.png") {
+        try {
+          const responseDelete = await deleteImage(oldPictureName);
+          console.log(responseDelete.message); // Log the deletion status
+        } catch (error) {
+          console.error("Failed to delete old image:", error);
+          await deleteImage(newPictureName); // Rollback by deleting the newly uploaded image
+          throw new Error("Failed to delete old image.");
         }
       }
 
-      // Update the user's picture path in the database
+      // Update the user's picture path and picture name in the database
       const updatedUser = await User.findByIdAndUpdate(
         id,
-        { picturePath: responseUpload },
+        { 
+          picturePath: responseUpload, 
+          pictureName: newPictureName // Update the picture name
+        },
         { new: true }
       );
-      const updatedPostsPicture = await Post.findByIdAndUpdate(
-        id,
-        { picturePath: responseUpload },
-        { new: true }
+
+      // Update all posts associated with this user to use the new userPicturePath
+      const updatedPostsPicture = await Post.updateMany(
+        { userId: id },
+        { userPicturePath: responseUpload } // Set the new user picture URL in all posts
       );
-      res.status(200).json(updatedUser);
+
+      console.log(`Updated ${updatedPostsPicture.modifiedCount} posts with new user picture path.`);
+
+      res.status(200).json(updatedUser); // Respond with the updated user
     } else {
-      throw new Error('Failed to upload new image');
+      throw new Error("Failed to upload new image.");
     }
   } catch (error) {
-    // If there's an error, reset the user's picture path or respond with an error message
-    await User.findByIdAndUpdate(id, { picturePath: 'https://firebasestorage.googleapis.com/v0/b/tiktour-79fa8.appspot.com/o/images%2Fuser.png?alt=media&token=f959d22e-4d99-495a-8be8-82d2483b30e5' }, { new: true });
+    console.error("Error in updateUserPicture:", error);
+    // Reset the user's picture path if there was an error
+    await User.findByIdAndUpdate(id, { 
+      picturePath: 'https://firebasestorage.googleapis.com/v0/b/tiktour-79fa8.appspot.com/o/images%2Fuser.png?alt=media&token=f959d22e-4d99-495a-8be8-82d2483b30e5',
+      pictureName: "user.png"
+    }, { new: true });
     res.status(500).json({ error: error.message });
   }
 };
+
+
+
+
 
 
 /* DELETE USER */

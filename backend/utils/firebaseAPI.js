@@ -1,5 +1,6 @@
-import { ref, uploadBytes, getDownloadURL } from "firebase/storage"; // Ensure getDownloadURL is imported
+import { ref, uploadBytes, getDownloadURL, deleteObject } from "firebase/storage";
 import { storage } from "./firebaseConfig.js";
+
 
 export const uploadImage = async (filename, fileBuffer) => {
   let downloadURL=null;
@@ -40,21 +41,18 @@ export const uploadImage = async (filename, fileBuffer) => {
 
 
 export const deleteImage = async (filename) => {
-  if (filename!='https://firebasestorage.googleapis.com/v0/b/tiktour-79fa8.appspot.com/o/images%2Fuser.png?alt=media&token=f959d22e-4d99-495a-8be8-82d2483b30e5'){
-    try {
-      // Construct the full path to the file within Firebase Storage
-      const storageRef = ref(storage, `images/${filename}`);
+  try {
+    // Construct the full path to the file within Firebase Storage
+    const storageRef = ref(storage, `images/${filename}`);
 
-      // Attempt to delete the object at the specified reference
-      await deleteObject(storageRef);
+    // Attempt to delete the object at the specified reference
+    await deleteObject(storageRef);
 
-      console.log('Deletion successful');
-      return { message: "Image deleted successfully" };
-    } catch (error) {
-      // Log the error for debugging purposes
-      console.error("Failed to delete image:", error);
-      throw new Error("Failed to delete image");
-    }
+    console.log('Deletion successful');
+    return { message: "Image deleted successfully" };
+  } catch (error) {
+    // Log the error for debugging purposes
+    console.error("Failed to delete image:", error);
+    throw new Error("Failed to delete image");
   }
-  return true;
 };
