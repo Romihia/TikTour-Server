@@ -6,7 +6,7 @@ import { generateUniqueFileName, uploadImage } from "../utils/firebaseAPI.js";
 export const createPost = async (req, res) => {
   const newPictureNames = [];
   try {
-    const { userId, sharedById, description, location, hashtags: hashtagsString ,picturePath} = req.body;
+    const { userId, sharedById, description, location, hashtags ,picturePath} = req.body;
     const user = await User.findById(userId);
 
     // Handle multiple image uploads
