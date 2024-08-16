@@ -110,6 +110,7 @@ export const updatePost = async (req, res) => {
     const id = req.params.id;
     const { userId, description, location } = req.body;
     let hashtags = [];
+    
     if (req.body.hashtags) {
       try {
         hashtags = JSON.parse(req.body.hashtags);
