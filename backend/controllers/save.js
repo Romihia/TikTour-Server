@@ -2,13 +2,8 @@ import User from "../models/User.js";
 import Post from "../models/Post.js";
 
 export const saveUnsavePost = async (req, res) => {
-    try {
-      console.log("Request params:", req.params);
-  
+    try {  
       const { userId, postId } = req.params;
-      console.log("Received userId:", userId);
-      console.log("Received postId:", postId);
-  
       const user = await User.findById(userId).populate('savedPosts');
       const post = await Post.findById(postId);
   

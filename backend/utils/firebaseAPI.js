@@ -28,11 +28,9 @@ export const uploadImage = async (filename, fileBuffer) => {
 
     // Upload the file to Firebase Storage with the specified metadata
     const snapshot = await uploadBytes(storageRef, fileBuffer, metadata);
-    console.log('Upload successful:', snapshot.metadata);
     
     // Get the download URL for the uploaded file
     downloadURL = await getDownloadURL(storageRef);
-    console.log('Download URL:', downloadURL);
     
     // Return the download URL
     return downloadURL;

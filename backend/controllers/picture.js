@@ -13,7 +13,6 @@ export const addPicture = async (req, res) => {
 export const removePicture = async (req, res) => {
   try {
     const filename = req.params.fileId; // Capture the fileId parameter from the URL
-    console.log('Removing: ' + filename);
     await deleteImage(filename); // Call the delete function
     res.status(200).json({ message: 'Image deleted successfully' });
   } catch (error) {

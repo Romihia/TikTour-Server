@@ -156,8 +156,6 @@ export const updateUser = async (req, res) => {
 export const updateUserPrompt = async (req, res) => {
   const { username } = req.params;
   const { firstName, lastName, dateOfBirth, location } = req.body;
-  console.log("firstName:", firstName, "lastName:", lastName, "dateOfBirth:", dateOfBirth, "location:", location);
-
   try {
     
     const updatedUser = await User.findOneAndUpdate(
@@ -224,7 +222,6 @@ export const updateUserPicture = async (req, res) => {
   try {
     // Upload the new image to Firebase
     const responseUpload = await uploadImage(newPictureName, file.buffer);
-    console.log("New Image URL:", responseUpload);
 
     if (responseUpload) {
       // Fetch the existing user from the database
@@ -259,7 +256,6 @@ export const updateUserPicture = async (req, res) => {
         { userPicturePath: responseUpload } // Set the new user picture URL in all posts
       );
 
-      console.log(`Updated ${updatedPostsPicture.modifiedCount} posts with new user picture path.`);
 
       res.status(200).json(updatedUser); // Respond with the updated user
     } else {

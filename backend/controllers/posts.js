@@ -5,7 +5,6 @@ import { generateUniqueFileName, uploadImage } from "../utils/firebaseAPI.js";
 
 /* CREATE */
 export const createPost = async (req, res) => {
-  console.log("\n\ncreatePost\nreq.body: ", req.body);
   const newPictureNames = []; // To track uploaded images for rollback on failure
   try {
     const { userId, sharedById, description, location, picturePath } = req.body;
@@ -21,7 +20,6 @@ export const createPost = async (req, res) => {
       }
     }
 
-    console.log("\n\nhashtags: ", hashtags);
     const user = await User.findById(userId);
     if (!user) {
       return res.status(404).json({ message: "User not found." });
@@ -121,8 +119,6 @@ export const updatePost = async (req, res) => {
     }
     let { imagesToRemove } = req.body;
      // New param to track images to remove
-    console.log("*************************************************************");
-    console.log(imagesToRemove);
     if (Array.isArray(imagesToRemove)) {
       console.log("imagesToRemove is an array");
     } else {
@@ -143,7 +139,6 @@ export const updatePost = async (req, res) => {
     let picturePaths = post.picturePath; // Existing pictures
     
     for (const imageUrl of imagesToRemove) {
-      console.log("imageUrl:",imageUrl);
       // Remove from Firebase
       //await deleteImage(imageUrl.split('/').pop()); // Deletes from Firebase
       // Remove from the array

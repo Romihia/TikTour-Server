@@ -33,13 +33,11 @@ export const getUsersByAttributes = async (req, res) => {
 
 export const removeSearchFilterFromHistory = async (req, res) => {
   try {
-    console.log("\n\nremoveSearchFilterFromHistory()");
-    console.log("\n\nreq.body: ", req.body);
+
 
     const userId = req.body._id;
     const indexToRemove = req.body.indexToRemove;
-    console.log("userId:", userId);
-    console.log("indexToRemove:", indexToRemove);
+
 
     // Find the user by ID
     const user = await User.findById(userId);
@@ -49,7 +47,6 @@ export const removeSearchFilterFromHistory = async (req, res) => {
       return res.status(404).json({ _id: "UserNotFound", message: "User not found" });
     }
 
-    console.log("Found user: ", JSON.stringify(user));
     // Remove the specified filter from the history
     const updatedSearchingFiltersHistory = user.previousSearchingFilters.filter(
       (filter, i) => i !== indexToRemove
@@ -57,7 +54,6 @@ export const removeSearchFilterFromHistory = async (req, res) => {
 
     user.previousSearchingFilters = updatedSearchingFiltersHistory;
     user.save();
-    console.log("User updated with new filters", updatedSearchingFiltersHistory);
     res.status(200);
   } catch (err) {
     console.error("Error fetching user's search filter history:", err);
@@ -68,24 +64,19 @@ export const removeSearchFilterFromHistory = async (req, res) => {
 
 export const getUserSearchingFiltersHistory = async (req, res) => {
   try {
-    console.log("\n\ngetUserSearchingFiltersHistory()");
-    console.log("\n\nreq.params: ", req.params);
+
 
     const userId = req.params.id;
-    console.log("userId:", userId);
     // Find the user by ID
     const user = await User.findById(userId);
 
     if (!user) {
-      console.log("User not found");
       return res.status(404).json({ _id: "UserNotFound", message: "User not found" });
     }
     
-    console.log("Found user: ", JSON.stringify(user));
     // Add the new filter to the history
     const searchingFiltersHistory = user.previousSearchingFilters;
 
-    console.log("User updated with new filters", searchingFiltersHistory);
     res.status(200).json({result: searchingFiltersHistory});
   } catch (err) {
     console.error("Error fetching user's search filter history:", err);
@@ -95,12 +86,11 @@ export const getUserSearchingFiltersHistory = async (req, res) => {
 
 export const updateUserSearchingFiltersHistory = async (req, res) => {
   try {
-    console.log("\n\nupdateUserSearchingFiltersHistory");
-    console.log("req.body: ", req.body);
+
 
     const userId = req.body._id;
     const { ["_id"]: _, ...justFilters } = req.body;
-    console.log("justFilters: ", justFilters);
+
 
     // Find the user by ID
     const userToUpdate = await User.findById(userId);
@@ -109,11 +99,9 @@ export const updateUserSearchingFiltersHistory = async (req, res) => {
       return res.status(404).json({ _id: "UserNotFound", message: "User not found" });
     }
 
-    console.log("userToUpdate.previousSearchingFilters: ", userToUpdate.previousSearchingFilters);
 
     // Ensure that the search filter history does not exceed 5 items
     if (userToUpdate.previousSearchingFilters.length >= 5) {
-      console.log("Limit reached, removing oldest filter");
       userToUpdate.previousSearchingFilters.shift();
     }
 
@@ -122,7 +110,6 @@ export const updateUserSearchingFiltersHistory = async (req, res) => {
 
     // Save the updated user document
     await userToUpdate.save();
-    console.log("User updated with new filters", justFilters);
 
     res.status(200).json(userToUpdate);
   } catch (err) {
@@ -140,18 +127,15 @@ export const getPostsByAttributes = async (req, res) => {
     const queryAttributes = { ...req.query };
 
     const { searchType , ...rest } = queryAttributes;
-    console.log("query" , queryAttributes);
-    console.log("rest" , rest);
+
     
     // Use find to get all posts that match the query attributes
     const posts = await Post.find(rest);
     
     if (!posts.length) {
-      console.log("No posts found");
       return res.status(404).json({ _id: "PostsNotFound", message: "No posts found" });
     }
     
-    console.log("posts:" , posts);
     res.status(200).json(posts);
   } catch (err) {
     res.status(500).json({ message: err.message });
@@ -244,7 +228,6 @@ export const getContentByFreeTextSearch = async (req, res) => {
     }
 
     // Convert the Set to an Array for sending the response
-    console.log("Content found with the given search term:", Array.from(results));
     res.status(200).json(Array.from(results));
   } catch (err) {
     console.error("Error fetching content by free text search:", err);
