@@ -19,7 +19,7 @@ const UserSchema = new mongoose.Schema(
     email: {
       type: String,
       required: true,
-      max: 150,
+      max: 350,
       unique: true,
       // match: /^[^\s@]+@[^\s@]+\.[^\s@]+$/
     },
@@ -76,6 +76,10 @@ const UserSchema = new mongoose.Schema(
     isVerified: {
       type: Boolean,
       required: false,
+      default: false,
+    },
+    isDeleted: {
+      type: Boolean,
       default: false,
     },
     previousSearchingFilters: {

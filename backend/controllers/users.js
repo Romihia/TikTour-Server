@@ -46,8 +46,8 @@ export const getUserFollowers = async (req, res) => {
       user.followers.map((id) => User.findById(id))
     );
     const formattedFollowers = followers.map(
-      ({ _id, firstName, lastName, location, picturePath }) => {
-        return { _id, firstName, lastName, location, picturePath };
+      ({ _id, firstName, lastName, location, picturePath ,isDeleted}) => {
+        return { _id, firstName, lastName, location, picturePath,isDeleted };
       }
     );
     res.status(200).json(formattedFollowers);
@@ -267,16 +267,17 @@ export const updateUserPicture = async (req, res) => {
   }
 };
 
-
-
-
-
-
 /* DELETE USER */
 export const deleteUser = async (req, res) => {
   try {
     const { id } = req.params;
-    const user = await User.findByIdAndDelete(id);
+    const user = await User.findById(id);
+    await User.findByIdAndUpdate(id, { 
+      email: `deletedUser${id}@undefined.com`,
+      picturePath: 'https://firebasestorage.googleapis.com/v0/b/tiktour-79fa8.appspot.com/o/images%2Fdelete.png?alt=media&token=0b35882d-5c9e-4f77-a6f9-0ad5aa1642b6',
+      pictureName: "delete.png",
+      isDeleted: true,
+    }, { new: true });
     if (!user) return res.status(404).json({ msg: "User not found" });
     res.status(200).json({ msg: "User deleted successfully" });
   } catch (err) {

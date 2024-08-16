@@ -64,6 +64,9 @@ export const login = async (req, res) => {
     let user = await User.findOne({ email: identifier });
     if (!user) {
       user = await User.findOne({ username: identifier });
+      if (user && user.isDeleted) {
+        return res.status(400).json({ msg: "User does not exist. Incorrect email or username." });
+      }
     }
     if (!user) {
       return res.status(400).json({ msg: "User does not exist. Incorrect email or username." });

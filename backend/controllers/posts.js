@@ -6,22 +6,25 @@ import { generateUniqueFileName, uploadImage } from "../utils/firebaseAPI.js";
 /* CREATE */
 export const createPost = async (req, res) => {
   const newPictureNames = []; // To track uploaded images for rollback on failure
+  let hashtags = [];
   try {
     const { userId, sharedById, description, location, picturePath } = req.body;
-    let hashtags = [];
-
-    // Parse hashtags as an array
-    if (req.body.hashtags) {
-      try {
-        hashtags = JSON.parse(req.body.hashtags);
-      } catch (err) {
-        console.error("Error parsing hashtags: ", err);
-        return res.status(400).json({ message: "Invalid format for hashtags." });
+    if (!Array.isArray(req.body.hashtags)) {
+      // Parse hashtags as an array
+      if (req.body.hashtags) {
+        try {
+          hashtags = JSON.parse(req.body.hashtags);
+        } catch (err) {
+          console.error("Error parsing hashtags: ", err);
+          return res.status(400).json({ message: "Invalid format for hashtags." });
+        }
       }
+    }else{
+      hashtags = req.body.hashtags;
     }
-
     const user = await User.findById(userId);
     if (!user) {
+      console.log("User not found`", userId);
       return res.status(404).json({ message: "User not found." });
     }
 
@@ -29,15 +32,10 @@ export const createPost = async (req, res) => {
     const uplaodPicturePaths = [];
     if (req.files) {
       for (const file of req.files) {
-        try {
-          const newPictureName = generateUniqueFileName(file, Date.now());
-          newPictureNames.push(newPictureName);
-          const imageUrl = await uploadImage(newPictureName, file.buffer); 
-          uplaodPicturePaths.push(imageUrl); 
-        } catch (err) {
-          console.error("Error uploading image: ", err);
-          return res.status(500).json({ message: "Failed to upload images." });
-        }
+        const newPictureName = generateUniqueFileName(file, Date.now());
+        newPictureNames.push(newPictureName);
+        const imageUrl = await uploadImage(newPictureName, file.buffer); 
+        uplaodPicturePaths.push(imageUrl); 
       }
     }
 
@@ -95,7 +93,8 @@ export const createPost = async (req, res) => {
         console.error("Error deleting images after failed post creation: ", deleteErr);
       }
     }
-    res.status(409).json({ message: err.message });
+    const posts = await Post.find();
+    res.status(409).json(posts,{ message: err.message });
     console.error("Error on creating post: ", err);
   }
 };

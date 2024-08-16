@@ -77,7 +77,6 @@ export const saveUnsavePost = async (req, res) => {
             await user.save();
         }
     
-        console.log("\n\nSaved posts:", fetchedPosts);
     
         res.status(200).json({ savedPosts: fetchedPosts });
         } catch (err) {
