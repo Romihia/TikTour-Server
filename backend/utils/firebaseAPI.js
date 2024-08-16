@@ -3,13 +3,16 @@ import { storage } from "./firebaseConfig.js";
 
 
 export const uploadImage = async (filename, fileBuffer) => {
-  let downloadURL=null;
+  let downloadURL = null;
   try {
-    // Determine the content type based on the file extension or other criteria
+    // Convert the filename to lowercase to handle different cases
+    const lowerCaseFilename = filename.toLowerCase();
+
+    // Determine the content type based on the file extension
     let contentType;
-    if (filename.endsWith('.jpeg') || filename.endsWith('.jpg')) {
+    if (lowerCaseFilename.endsWith('.jpeg') || lowerCaseFilename.endsWith('.jpg')) {
       contentType = 'image/jpeg';
-    } else if (filename.endsWith('.png')) {
+    } else if (lowerCaseFilename.endsWith('.png')) {
       contentType = 'image/png';
     } else {
       throw new Error('Unsupported file type');

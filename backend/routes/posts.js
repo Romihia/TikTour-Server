@@ -4,7 +4,19 @@ import { verifyToken } from "../middleware/auth.js";
 import multer from 'multer'; 
 
 // Use multer memory storage to handle file uploads directly to Firebase
-const upload = multer({ storage: multer.memoryStorage() }); 
+const upload = multer({
+    limits: {
+      fileSize: 20 * 1024 * 1024, // הגבלת גודל הקובץ (10MB בדוגמה זו)
+    },
+    fileFilter(req, file, cb) {
+        console.log("++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++");
+        console.log("File being uploaded:", file.originalname); // Add this line to see the filename
+        if (!file.originalname.match(/\.(jpg|jpeg|png)$/i)) {
+          return cb(new Error('Please upload a JPG, JPEG, or PNG file.'));
+        }
+        cb(null, true);
+      },
+  });
 
 const router = express.Router();
 
