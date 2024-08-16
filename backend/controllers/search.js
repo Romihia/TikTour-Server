@@ -8,14 +8,8 @@ export const getUsersByAttributes = async (req, res) => {
     // Extract query parameters to use as search criteria
     const queryAttributes = { ...req.query };
 
-    console.log("queryAttributes: ", queryAttributes);
 
     const { searchType , ...rest } = queryAttributes;
-
-
-    console.log("query" , queryAttributes)
-    console.log("rest" , rest)
-    
     // Use find to get all users that match the query attributes
     const users = await User.find(rest);
     
@@ -23,7 +17,6 @@ export const getUsersByAttributes = async (req, res) => {
       console.log("No users found");
       return res.status(404).json({ _id: "UsersNotFound", message: "No users found" });
     }
-    
     console.log("users:" , users);
     res.status(200).json(users);
   } catch (err) {
@@ -144,12 +137,7 @@ export const getPostsByAttributes = async (req, res) => {
 
 export const getContentByFreeTextSearch = async (req, res) => {
   try {
-    console.log("\n\ngetContentByFreeTextSearch()");
-    console.log("\n\nreq.query: ", req.query);
-
     const searchTerm = req.query.freeText;
-    console.log("searchTerm:", searchTerm);
-
     // Fetch all posts and users
     const posts = await Post.find().lean();
     const users = await User.find().lean();
@@ -168,10 +156,6 @@ export const getContentByFreeTextSearch = async (req, res) => {
 
     const postSearchFields = Object.keys(randomPost); // Get all fields for posts
     const userSearchFields = Object.keys(randomUser); // Get all fields for users
-
-    console.log("\n\npostSearchFields:", postSearchFields);
-    console.log("\n\nuserSearchFields:", userSearchFields);
-
     const results = new Set();
     const seenPostIds = new Set();
     const seenUserIds = new Set();

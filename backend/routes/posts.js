@@ -8,9 +8,7 @@ const upload = multer({
     limits: {
       fileSize: 20 * 1024 * 1024, // הגבלת גודל הקובץ (10MB בדוגמה זו)
     },
-    fileFilter(req, file, cb) {
-        console.log("++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++");
-        console.log("File being uploaded:", file.originalname); // Add this line to see the filename
+    fileFilter(req, file, cb) { // Add this line to see the filename
         if (!file.originalname.match(/\.(jpg|jpeg|png)$/i)) {
           return cb(new Error('Please upload a JPG, JPEG, or PNG file.'));
         }

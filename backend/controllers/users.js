@@ -20,7 +20,6 @@ export const getUser = async (req, res) => {
 
 export const getUserByUsername = async (req, res) => {
   try {
-    console.log("\n\n req.params: " + JSON.stringify(req.params) + "\n\n");
     const { username } = req.params;
     
     // Use findOne to find a user by username
@@ -82,8 +81,6 @@ export const addRemoveFollow = async (req, res) => {
     const { id, userId } = req.params;  // 'id' is the logged-in user, 'userId' is the user to follow/unfollow
     const user = await User.findById(id);
     const follower = await User.findById(userId);
-    console.log(id);
-
     if (!user || !follower) {
       return res.status(404).json({ message: "User(s) not found" });
     }
@@ -138,8 +135,6 @@ export const addRemoveFollow = async (req, res) => {
 export const updateUser = async (req, res) => {
   const { id } = req.params;
   const { firstName, lastName, email, location } = req.body;
-  console.log("id:",id,"firstName:", firstName, "lastName:", lastName, "email:", email, "location:", location);
-
   try {
     const updatedUser = await User.findByIdAndUpdate(
       id ,

@@ -48,8 +48,6 @@ export const deleteImage = async (filename) => {
 
     // Attempt to delete the object at the specified reference
     await deleteObject(storageRef);
-
-    console.log('Deletion successful');
     return { message: "Image deleted successfully" };
   } catch (error) {
     // Log the error for debugging purposes

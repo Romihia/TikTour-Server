@@ -56,11 +56,7 @@ export const saveUnsavePost = async (req, res) => {
     // Controller function to get saved posts and handle missing posts
     export const getSavedPosts = async (req, res) => {
         try {
-        console.log("Request params:", req.params);
-    
         const { userId } = req.params;
-        console.log("Received userId:", userId);
-    
         const user = await User.findById(userId);
     
         if (!user) {
