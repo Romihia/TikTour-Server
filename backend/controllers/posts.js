@@ -1,30 +1,52 @@
+import { hash } from "bcrypt";
 import Post from "../models/Post.js";
 import User from "../models/User.js";
 import { generateUniqueFileName, uploadImage } from "../utils/firebaseAPI.js";
 
 /* CREATE */
 export const createPost = async (req, res) => {
-  const newPictureNames = [];
+  console.log("\n\ncreatePost\nreq.body: ", req.body);
+  const newPictureNames = []; // To track uploaded images for rollback on failure
   try {
-    const { userId, sharedById, description, location, hashtags ,picturePath} = req.body;
+    const { userId, sharedById, description, location, picturePath } = req.body;
+    let hashtags = [];
+
+    // Parse hashtags as an array
+    if (req.body.hashtags) {
+      try {
+        hashtags = JSON.parse(req.body.hashtags);
+      } catch (err) {
+        console.error("Error parsing hashtags: ", err);
+        return res.status(400).json({ message: "Invalid format for hashtags." });
+      }
+    }
+
+    console.log("\n\nhashtags: ", hashtags);
     const user = await User.findById(userId);
+    if (!user) {
+      return res.status(404).json({ message: "User not found." });
+    }
 
     // Handle multiple image uploads
     const uplaodPicturePaths = [];
     if (req.files) {
       for (const file of req.files) {
-        // Generate a unique filename using the utility function
-        const newPictureName = generateUniqueFileName(file, Date.now());
-        newPictureNames.push(newPictureName);
-        const imageUrl = await uploadImage(newPictureName, file.buffer); // Upload to Firebase
-        uplaodPicturePaths.push(imageUrl); // Collect image URLs
+        try {
+          const newPictureName = generateUniqueFileName(file, Date.now());
+          newPictureNames.push(newPictureName);
+          const imageUrl = await uploadImage(newPictureName, file.buffer); 
+          uplaodPicturePaths.push(imageUrl); 
+        } catch (err) {
+          console.error("Error uploading image: ", err);
+          return res.status(500).json({ message: "Failed to upload images." });
+        }
       }
     }
-    if(picturePath){
-      for (const picture of picturePath) {// when using sherd opshion
-        uplaodPicturePaths.push(picture); 
-      }
+
+    if (picturePath) {
+      uplaodPicturePaths.push(...picturePath); // Append any existing picture paths
     }
+
     const newPost = new Post({
       userId,
       sharedById,
@@ -34,7 +56,7 @@ export const createPost = async (req, res) => {
       location,
       description,
       userPicturePath: user.picturePath,
-      picturePath: uplaodPicturePaths, // Store multiple image URLs
+      picturePath: uplaodPicturePaths,
       likes: {},
       dislikes: {},
       hashtags,
@@ -43,56 +65,59 @@ export const createPost = async (req, res) => {
     await newPost.save();
 
     // Notify the author of the shared post.
-    const sharingUser = await User.findById(sharedById);
+    if (sharedById) {
+      const sharingUser = await User.findById(sharedById);
+      if (sharingUser) {
+        const newNotification = {
+          notificationType: "share",
+          text: `${sharingUser.username} shared your post.`,
+          originalPostId: newPost._id,
+          userId: sharedById,
+        };
 
-    const originalPost = await Post.findOne({
-      userId: userId,
-      sharedById: sharedById,
-      description: description,
-      location: location,
-      hashtags: hashtags
-    });
+        user.notifications = user.notifications.filter(
+          (notification) => JSON.stringify(notification) !== JSON.stringify(newNotification)
+        );
 
-    const newNotification = {
-      notificationType: "share",
-      text: `${sharingUser.username} shared your post.`,
-      originalPostId: originalPost._id,
-      userId: sharedById,
+        user.notifications.push(newNotification);
+        await user.save();
+      }
     }
 
-    user.notifications = user.notifications.filter((notification) => {
-      return JSON.stringify(notification) !== JSON.stringify(newNotification);
-    });
-
-    user.notifications.push(newNotification);
-
-    await user.save();
-
-    const post = await Post.find();
-    res.status(201).json(post);
+    const posts = await Post.find();
+    res.status(201).json(posts);
   } catch (err) {
-    // Delete the uploaded images if creation fails
-    if (newPictureNames.length > 0){
+    // Rollback: Delete uploaded images if post creation fails
+    if (newPictureNames.length > 0) {
       try {
-        // Delete the images from Firebase
-        for (const PictureNameToDelete of newPictureNames) {
-          await deleteImage(PictureNameToDelete);
+        for (const pictureName of newPictureNames) {
+          await deleteImage(pictureName);
         }
-      } catch (err) {
-        console.log("Error on deleting images after failed post creation.");
+      } catch (deleteErr) {
+        console.error("Error deleting images after failed post creation: ", deleteErr);
       }
     }
     res.status(409).json({ message: err.message });
-    console.log("Error on creating post.");
+    console.error("Error on creating post: ", err);
   }
 };
+
 
 // Update a post
 export const updatePost = async (req, res) => {
   const newPictureNames = [];
   try {
     const id = req.params.id;
-    const { userId, description, location, hashtags } = req.body;
+    const { userId, description, location } = req.body;
+    let hashtags = [];
+    if (req.body.hashtags) {
+      try {
+        hashtags = JSON.parse(req.body.hashtags);
+      } catch (err) {
+        console.error("Error parsing hashtags: ", err);
+        return res.status(400).json({ message: "Invalid format for hashtags." });
+      }
+    }
     let { imagesToRemove } = req.body;
      // New param to track images to remove
     console.log("*************************************************************");
