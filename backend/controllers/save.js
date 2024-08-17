@@ -12,20 +12,21 @@ export const saveUnsavePost = async (req, res) => {
       }
   
       const postIndex = user.savedPosts.findIndex(savedPost => savedPost === postId);
-  
+      let isSaved
       let responseToUser = "";
       if (postIndex > -1) {
         responseToUser = "Post was unsaved.";
+        isSaved=false;
         user.savedPosts.splice(postIndex, 1);
       } else {
         responseToUser = "Post was saved.";
-  
+        isSaved=true;
         user.savedPosts.push(postId);
       }
   
       await user.save();
-  
-      res.status(200).json({ message: responseToUser });
+
+      res.status(200).json({isSaved:isSaved, message: responseToUser });
     } catch (err) {
       console.error("Error in saveUnsavePost:", err);
       res.status(500).json({ message: err.responseToUser });
