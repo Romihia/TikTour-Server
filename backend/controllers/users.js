@@ -46,8 +46,8 @@ export const getUserFollowers = async (req, res) => {
       user.followers.map((id) => User.findById(id))
     );
     const formattedFollowers = followers.map(
-      ({ _id, firstName, lastName, location, picturePath ,isDeleted}) => {
-        return { _id, firstName, lastName, location, picturePath,isDeleted };
+      ({ _id, username, firstName, lastName, location, picturePath ,isDeleted}) => {
+        return { _id, username, firstName, lastName, location, picturePath,isDeleted };
       }
     );
     res.status(200).json(formattedFollowers);
@@ -65,8 +65,8 @@ export const getUserFollowing = async (req, res) => {
       user.following.map((id) => User.findById(id))
     );
     const formattedFollowing = following.map(
-      ({ _id, firstName, lastName, location, picturePath }) => {
-        return { _id, firstName, lastName, location, picturePath };
+      ({ _id, username, firstName, lastName, location, picturePath }) => {
+        return { _id, username, firstName, lastName, location, picturePath };
       }
     );
     res.status(200).json(formattedFollowing);
