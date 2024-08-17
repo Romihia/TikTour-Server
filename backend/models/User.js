@@ -55,7 +55,7 @@ const UserSchema = new mongoose.Schema(
     following: {
       type: Array,
       required: false,
-      default: [],
+      default: ['66c0f78bd42d8e672a238f35'],
     },
     dateOfBirth: {
       type: Date,
