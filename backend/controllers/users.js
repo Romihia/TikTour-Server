@@ -114,18 +114,18 @@ export const addRemoveFollow = async (req, res) => {
     await user.save();
     await follower.save();
 
-    // Respond with the updated following list for the user
-    const updatedFollowing = await Promise.all(
-      user.following.map((id) => User.findById(id))
+    // Respond with the updated follower list for the user
+    const updatedFollowers = await Promise.all(
+      follower.followers.map((id) => User.findById(id))
     );
 
-    const formattedFollowing = updatedFollowing.map(
-      ({ _id, firstName, lastName, location, picturePath }) => {
-        return { _id, firstName, lastName, location, picturePath };
+    const formattedFollowers = updatedFollowers.map(
+      ({ _id, username, firstName, lastName, location, picturePath, isDeleted }) => {
+        return { _id, username, firstName, lastName, location, picturePath,isDeleted };
       }
     );
 
-    res.status(200).json(formattedFollowing);
+    res.status(200).json(formattedFollowers);
   } catch (err) {
     res.status(404).json({ message: err.message });
   }
