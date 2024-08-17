@@ -212,10 +212,14 @@ export const likePost = async (req, res) => {
     const { userId } = req.body;
     const post = await Post.findById(id);
     const isLiked = post.likes.get(userId);
+    const isDisLiked = post.dislikes.get(userId);
     if (isLiked) {
       post.likes.delete(userId);
     } else {
       post.likes.set(userId, true);
+      if (isDisLiked){
+        post.dislikes.delete(userId);
+      }
       const currentUser = await User.findById(userId);
       const userToNotify = await User.findOne({"username": post.userName});
 
@@ -240,9 +244,10 @@ export const likePost = async (req, res) => {
 
     const updatedPost = await Post.findByIdAndUpdate(
       id,
-      { likes: post.likes },
+      { likes: post.likes, dislikes: post.dislikes},
       { new: true }
     );
+   
     res.status(200).json(updatedPost);
   } catch (err) {
     res.status(404).json({ message: err.message });
@@ -255,11 +260,15 @@ export const dislikePost = async (req, res) => {
     const { userId } = req.body;
     const post = await Post.findById(id);
     const isDisLiked = post.dislikes.get(userId);
+    const isLiked = post.likes.get(userId);
 
     if (isDisLiked) {
       post.dislikes.delete(userId);
     } else {
       post.dislikes.set(userId, true);
+      if (isLiked){
+        post.likes.delete(userId);
+      }
       const currentUser = await User.findById(userId);
       const userToNotify = await User.findOne({"username": post.userName});
 
@@ -283,7 +292,7 @@ export const dislikePost = async (req, res) => {
 
     const updatedPost = await Post.findByIdAndUpdate(
       id,
-      { dislikes: post.dislikes },
+      { dislikes: post.dislikes, likes: post.likes},
       { new: true }
     );
 
